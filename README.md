@@ -10,6 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open_Source-❤️-red)](CONTRIBUTING.md)
+[![Version](https://img.shields.io/badge/Version-1.0.1-blue)](CHANGELOG.md)
 [![Ollama](https://img.shields.io/badge/Runs_on-Ollama-indigo)](https://ollama.ai)
 [![Tauri](https://img.shields.io/badge/Built_with-Tauri_2.0-blue)](https://tauri.app)
 

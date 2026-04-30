@@ -26,6 +26,15 @@
       "identifier": "fs:allow-write-text-file",
       "allow": [{ "path": "**", "recursive": true }]
     },
-    "core:path:default"
+    "core:path:default",
+    "http:default",
+    {
+      "identifier": "http:allow-fetch",
+      "allow": [
+        {
+          "url": "http://localhost:11434/**"
+        }
+      ]
+    }
   ]
 }

@@ -1,9 +1,13 @@
+import { fetch } from '@tauri-apps/plugin-http'
+
 // Ollama API client
-// Talks to Ollama at http://localhost:11434 (proxied via /ollama in dev, direct in prod)
+// Talks to Ollama at http://localhost:11434
 
 const getBase = () => {
   const stored = localStorage.getItem('ollama_host')
-  const base = stored || '/ollama'
+  // In production or if unset, default to the standard Ollama port
+  // In dev, if you want to use the vite proxy, you can set ollama_host to '/ollama'
+  const base = stored || 'http://localhost:11434'
   return base.replace(/\/$/, '')
 }
 

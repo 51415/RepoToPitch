@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] — 2026-04-30
+### Connectivity Patch
+- **Ollama Production Fix**: Resolved an issue where the production executable failed to connect to local Ollama instances.
+- **Tauri HTTP Plugin Integration**: Switched to native Rust-based HTTP client to bypass browser CORS restrictions and proxy dependencies.
+- **Direct Endpoint Stability**: Corrected default connection logic to ensure reliable "out-of-the-box" connectivity for new installations.
+
+
 ## [1.0.0] — 2026-04-30
 ### Release 1
 - **Initial Public Release**: Full-featured standalone desktop edition of RepoToPitch.

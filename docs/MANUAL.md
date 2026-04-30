@@ -1,6 +1,6 @@
 <img src="../public/icons/main logo.png" width="200" alt="RepoToPitch" />
 
-# RepoToPitch — Documentation
+# RepoToPitch — Documentation (v1.0.1)
 
 ## Contents
 

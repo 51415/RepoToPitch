@@ -1,6 +1,6 @@
 [package]
 name = "repotopitch"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -25,3 +25,4 @@ tauri = { version = "2.10.3", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
+tauri-plugin-http = "2.5.8"
