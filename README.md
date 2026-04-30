@@ -43,11 +43,6 @@ It uses whatever local LLM you have running in Ollama — `llama3.2`, `qwen2.5`,
 ---
 # Pricing Section
 
-Insert this section into README.md after the "Who this is for" section
-and before "Quick Start".
-
----
-
 ## Editions & Pricing
 
 RepoToPitch is open source. The source code is free and always will be.
