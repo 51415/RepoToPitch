@@ -32,8 +32,17 @@ export default function Sidebar() {
     techArchitecture, goToMarket, competitivePositioning, riskRegister, 
     dataPrivacy, apiDocs, onboardingGuide,
     addTask, updateTask, removeTask,
-    showSettings, setShowSettings, projectName, isDirty, saveProject, resetProject
+    showSettings, setShowSettings, projectName, isDirty, saveProject, resetProject,
+    triggerSettingsFlash
   } = useStore()
+
+  const handleSidebarAction = (action) => {
+    if (showSettings) {
+      triggerSettingsFlash()
+      return
+    }
+    action()
+  }
   
   const isGenerating = tasks.some(t => t.status === 'active')
 
@@ -163,12 +172,12 @@ export default function Sidebar() {
                    variant="primary"
                    size="sm"
                    style={{ fontSize: 9, padding: '6px 10px', height: 28 }}
-                   onClick={() => {
+                   onClick={() => handleSidebarAction(() => {
                      if (isDirty) {
                        if (!confirm('You have unsaved changes. Start new project?')) return
                      }
                      resetProject()
-                   }}
+                   })}
                    disabled={isGenerating}
                 >
                    New Project
@@ -177,11 +186,11 @@ export default function Sidebar() {
                    variant={isDirty ? "accent" : "secondary"} 
                    size="sm"
                    style={{ fontSize: 9, padding: '6px 10px', height: 28 }}
-                   onClick={async () => { 
+                   onClick={() => handleSidebarAction(async () => { 
                      let name = projectName;
                      if (!name) name = prompt('Enter project name to save:'); 
                      if (name) await saveProject(name); 
-                   }}
+                   })}
                    disabled={isGenerating}
                 >
                    {isDirty ? 'Save Changes*' : 'Project Saved'}
@@ -190,12 +199,12 @@ export default function Sidebar() {
                    variant="secondary" 
                    size="sm" 
                    style={{ fontSize: 10, padding: '6px 10px', height: 28, color: 'var(--text-3)', borderColor: 'var(--border-strong)' }}
-                   onClick={() => {
+                   onClick={() => handleSidebarAction(() => {
                      if (isDirty) {
                        if (!confirm('You have unsaved changes. RE-INITIALISE will erase current progress. Continue?')) return
                      }
                      resetProject()
-                   }}
+                   })}
                    disabled={isGenerating}
                 >
                    Re-initialise
@@ -212,7 +221,7 @@ export default function Sidebar() {
             return (
               <div key={step.id}>
                 <div 
-                  onClick={() => unlocked && setStep(step.id)}
+                  onClick={() => handleSidebarAction(() => unlocked && setStep(step.id))}
                   title={isCollapsed ? step.label : ''}
                   style={{
                     padding: isCollapsed ? '12px 0' : '12px 24px',
@@ -260,14 +269,14 @@ export default function Sidebar() {
                     {repos.map(r => (
                       <div 
                         key={r.id}
-                        onClick={() => {
+                        onClick={() => handleSidebarAction(() => {
                           setStep(1)
                           useStore.getState().setActiveRepoId(r.id)
                           setTimeout(() => {
                             const el = document.getElementById(`repo-card-${r.id}`)
                             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
                           }, 100)
-                        }}
+                        })}
                         style={{ 
                           fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                           color: 'var(--text-3)', cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
@@ -285,14 +294,14 @@ export default function Sidebar() {
                     {repos.map(r => (
                       <div 
                         key={r.id}
-                        onClick={() => {
+                        onClick={() => handleSidebarAction(() => {
                           setStep(2)
                           useStore.getState().setActiveAnalyseRepoId(r.id)
                           setTimeout(() => {
                             const el = document.getElementById(`repo-panel-${r.id}`)
                             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
                           }, 100)
-                        }}
+                        })}
                         style={{ 
                           fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                           color: 'var(--text-3)', cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
@@ -310,7 +319,7 @@ export default function Sidebar() {
                     {ARTIFACT_TABS.map(tab => (
                       <div 
                         key={tab.id}
-                        onClick={() => setMasterPageTab(tab.id)}
+                        onClick={() => handleSidebarAction(() => setMasterPageTab(tab.id))}
                         style={{ 
                           fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: masterPageTab === tab.id ? 800 : 700, 
                           color: masterPageTab === tab.id ? 'var(--accent)' : 'var(--text-3)', cursor: 'pointer'
@@ -321,10 +330,10 @@ export default function Sidebar() {
                     ))}
                     <div style={{ height: 1, background: 'var(--border)', margin: '4px 0' }} />
                     <div 
-                      onClick={() => {
+                      onClick={() => handleSidebarAction(() => {
                         const hasContent = !!(projectOverview || masterPrd || techArchitecture || goToMarket || competitivePositioning || riskRegister || dataPrivacy || apiDocs || onboardingGuide)
                         if (!isGenerating && hasContent) exportAllArtifacts()
-                      }}
+                      })}
                       style={{ 
                         fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 800, 
                         color: (projectOverview || masterPrd || techArchitecture || goToMarket || competitivePositioning || riskRegister || dataPrivacy || apiDocs || onboardingGuide) ? (isGenerating ? 'var(--text-3)' : 'var(--text-2)') : 'var(--text-3)', 
@@ -340,7 +349,7 @@ export default function Sidebar() {
                 {!isCollapsed && active && step.id === 5 && (
                   <div style={{ padding: '8px 24px 16px 48px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div 
-                      onClick={() => !isGenerating && pitchSlides.length > 0 && exportPitchAsPDF(pitchSlides, 'pitch-deck.pdf')}
+                      onClick={() => handleSidebarAction(() => !isGenerating && pitchSlides.length > 0 && exportPitchAsPDF(pitchSlides, 'pitch-deck.pdf'))}
                       style={{ 
                         fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                         color: (pitchSlides.length > 0) ? (isGenerating ? 'var(--text-3)' : 'var(--text-2)') : 'var(--text-3)', 
@@ -351,7 +360,7 @@ export default function Sidebar() {
                       DOWNLOAD PDF
                     </div>
                     <div 
-                      onClick={() => !isGenerating && pitchSlides.length > 0 && exportAsPptx(pitchSlides, 'pitch-deck.pptx')}
+                      onClick={() => handleSidebarAction(() => !isGenerating && pitchSlides.length > 0 && exportAsPptx(pitchSlides, 'pitch-deck.pptx'))}
                       style={{ 
                         fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                         color: (pitchSlides.length > 0) ? (isGenerating ? 'var(--text-3)' : 'var(--text-2)') : 'var(--text-3)', 
@@ -362,7 +371,7 @@ export default function Sidebar() {
                       EXPORT PPTX
                     </div>
                     <div 
-                      onClick={() => !isGenerating && pitchSlides.length > 0 && exportAsJSON(pitchSlides, 'pitch-deck.json')}
+                      onClick={() => handleSidebarAction(() => !isGenerating && pitchSlides.length > 0 && exportAsJSON(pitchSlides, 'pitch-deck.json'))}
                       style={{ 
                         fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                         color: (pitchSlides.length > 0) ? (isGenerating ? 'var(--text-3)' : 'var(--text-2)') : 'var(--text-3)', 

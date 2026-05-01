@@ -11,10 +11,20 @@ export default function SettingsPage() {
     ollamaHost: storeOllamaHost, setOllamaHost, 
     customPrompts: storeCustomPrompts, setCustomPrompts,
     resetSystem,
-    setShowSettings 
+    setShowSettings,
+    settingsFlashCount
   } = useStore()
   
   const [activeTab, setActiveTab] = useState('models') // 'models' | 'prompts'
+  const [flashing, setFlashing] = useState(false)
+
+  useEffect(() => {
+    if (settingsFlashCount > 0) {
+      setFlashing(true)
+      const timer = setTimeout(() => setFlashing(false), 600)
+      return () => clearTimeout(timer)
+    }
+  }, [settingsFlashCount])
   
   const [localModelCode, setLocalModelCode] = useState(storeModelCode)
   const [localModelArtifacts, setLocalModelArtifacts] = useState(storeModelArtifacts)
@@ -80,10 +90,10 @@ export default function SettingsPage() {
     <div style={{ maxWidth: 750, margin: '0 auto', padding: '40px 30px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
         <div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 24, margin: 0, letterSpacing: '-0.04em' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 26, margin: 0, letterSpacing: '-0.04em' }}>
             SETTINGS
           </h1>
-          <p style={{ color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 9, marginTop: 8 }}>
+          <p style={{ color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 11, marginTop: 8 }}>
             AI MODELS & PROMPT CONFIGURATION
           </p>
         </div>
@@ -91,7 +101,14 @@ export default function SettingsPage() {
           {isDirty && (
             <Btn onClick={handleSave} variant="primary">SAVE CHANGES</Btn>
           )}
-          <Btn onClick={handleClose} variant="secondary">CLOSE [ESC]</Btn>
+          <Btn 
+            onClick={handleClose} 
+            variant="secondary" 
+            className={flashing ? 'flash-pulse' : ''}
+            style={flashing ? { borderColor: 'var(--accent)', boxShadow: '0 0 20px var(--accent-soft)', transform: 'scale(1.1)' } : {}}
+          >
+            CLOSE [ESC]
+          </Btn>
         </div>
       </div>
 
@@ -104,7 +121,7 @@ export default function SettingsPage() {
               padding: '10px 24px', border: 'none', 
               background: activeTab === t.toLowerCase() ? 'var(--accent)' : 'transparent',
               color: activeTab === t.toLowerCase() ? '#FFF' : 'var(--text-2)', 
-              fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700,
+              fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700,
               cursor: 'pointer', transition: 'all 0.1s'
             }}
           >
@@ -120,7 +137,7 @@ export default function SettingsPage() {
             
             {/* Code Review Model */}
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-2)', letterSpacing: '0.1em', fontWeight: 800, marginBottom: 12 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.1em', fontWeight: 800, marginBottom: 12 }}>
                 CODE ANALYSIS ENGINE
               </div>
               <ModelSelect 
@@ -134,7 +151,7 @@ export default function SettingsPage() {
 
             {/* Artifact Model */}
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-2)', letterSpacing: '0.1em', fontWeight: 800, marginBottom: 12 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.1em', fontWeight: 800, marginBottom: 12 }}>
                 ARTIFACT SYNTHESIS ENGINE
               </div>
               <ModelSelect 
@@ -147,7 +164,7 @@ export default function SettingsPage() {
             </div>
 
             <div style={{ borderTop: '2px solid var(--danger)', paddingTop: 32 }}>
-               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--danger)', marginBottom: 12, fontWeight: 800 }}>
+               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--danger)', marginBottom: 12, fontWeight: 800 }}>
                  DANGER ZONE
                </div>
                 <Btn 
@@ -170,7 +187,7 @@ export default function SettingsPage() {
           {/* Right Column: Connection */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', marginBottom: 12, letterSpacing: '0.1em', fontWeight: 700 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 12, letterSpacing: '0.1em', fontWeight: 700 }}>
                 OLLAMA ENDPOINT
               </div>
               <div style={{ display: 'flex', gap: 0, border: '2px solid var(--accent)' }}>
@@ -178,34 +195,34 @@ export default function SettingsPage() {
                   value={localHost}
                   onChange={setLocalHost}
                   placeholder="http://localhost:11434"
-                  style={{ flex: 1, border: 'none', background: 'transparent', padding: '10px 16px', fontSize: 10 }}
+                  style={{ flex: 1, border: 'none', background: 'transparent', padding: '10px 16px', fontSize: 12 }}
                 />
                 <button 
                   onClick={() => tryConnect(localHost)} 
                   disabled={loading}
                   style={{
                     background: 'var(--accent)', color: '#FFF', border: 'none',
-                    padding: '0 16px', fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 800, cursor: 'pointer'
+                    padding: '0 16px', fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 800, cursor: 'pointer'
                   }}
                 >
                   {loading ? '...' : 'LINK'}
                 </button>
               </div>
               {connected && (
-                <div style={{ marginTop: 12, fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--success)', fontWeight: 700 }}>
+                <div style={{ marginTop: 12, fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--success)', fontWeight: 700 }}>
                   [STATUS CONNECTED] · {models.length} UNITS AVAILABLE
                 </div>
               )}
             </div>
 
             <div style={{ background: 'var(--bg-1)', border: '1px solid var(--accent)', padding: '24px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', marginBottom: 16, letterSpacing: '0.1em', fontWeight: 700 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', marginBottom: 16, letterSpacing: '0.1em', fontWeight: 700 }}>
                 PRIVACY PROTOCOL
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-2)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6 }}>
                  <strong>LOCAL-FIRST DATA:</strong> All project data is stored in your browser's local storage. Your source files are analyzed in-place and never uploaded.
               </div>
-              <div style={{ marginTop: 16, fontSize: 10, color: 'var(--text-3)', lineHeight: 1.6, borderLeft: '2px solid var(--accent)', paddingLeft: 16 }}>
+              <div style={{ marginTop: 16, fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6, borderLeft: '2px solid var(--accent)', paddingLeft: 16 }}>
                  Processing occurs entirely via your local Ollama instance.
               </div>
             </div>
@@ -217,7 +234,7 @@ export default function SettingsPage() {
         <div className="fade-in" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 40 }}>
           {/* Prompt Selector */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', letterSpacing: '0.1em', fontWeight: 700, marginBottom: 12 }}>
+             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em', fontWeight: 700, marginBottom: 12 }}>
                 PROMPT REGISTRY
               </div>
               {promptKeys.map(key => (
@@ -229,7 +246,7 @@ export default function SettingsPage() {
                     background: selectedPromptKey === key ? 'var(--bg-2)' : 'transparent',
                     borderLeft: selectedPromptKey === key ? '3px solid var(--accent)' : '3px solid transparent',
                     color: selectedPromptKey === key ? 'var(--text)' : 'var(--text-2)',
-                    fontFamily: 'var(--font-mono)', fontSize: 10, cursor: 'pointer',
+                    fontFamily: 'var(--font-mono)', fontSize: 12, cursor: 'pointer',
                     transition: 'all 0.1s'
                   }}
                 >
@@ -241,7 +258,7 @@ export default function SettingsPage() {
           {/* Prompt Editor */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
              <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-3)', marginBottom: 8, fontWeight: 700 }}>SYSTEM INSTRUCTION</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', marginBottom: 8, fontWeight: 700 }}>SYSTEM INSTRUCTION</div>
                 <textarea 
                   value={localCustomPrompts[selectedPromptKey]?.system ?? DEFAULT_PROMPTS[selectedPromptKey].system}
                   onChange={(e) => setLocalCustomPrompts({
@@ -250,13 +267,13 @@ export default function SettingsPage() {
                   })}
                   style={{
                     width: '100%', height: 100, background: 'var(--bg-1)', border: '1px solid var(--border)',
-                    padding: 12, fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text)',
+                    padding: 12, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text)',
                     resize: 'vertical', outline: 'none'
                   }}
                 />
              </div>
              <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-3)', marginBottom: 8, fontWeight: 700 }}>USER PROMPT TEMPLATE</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)', marginBottom: 8, fontWeight: 700 }}>USER PROMPT TEMPLATE</div>
                 <textarea 
                   value={localCustomPrompts[selectedPromptKey]?.prompt ?? DEFAULT_PROMPTS[selectedPromptKey].prompt}
                   onChange={(e) => setLocalCustomPrompts({
@@ -265,7 +282,7 @@ export default function SettingsPage() {
                   })}
                   style={{
                     width: '100%', height: 300, background: 'var(--bg-1)', border: '1px solid var(--border)',
-                    padding: 12, fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text)',
+                    padding: 12, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text)',
                     resize: 'vertical', outline: 'none'
                   }}
                 />
@@ -281,7 +298,7 @@ function ModelSelect({ models, selected, onSelect, loading, connected }) {
   if (!connected && !loading) return (
     <div style={{ 
       padding: '12px 16px', background: 'var(--bg-1)', border: '1px solid var(--border)', 
-      color: 'var(--text-3)', fontSize: 9, fontFamily: 'var(--font-mono)' 
+      color: 'var(--text-3)', fontSize: 11, fontFamily: 'var(--font-mono)' 
     }}>
       [LINK OLLAMA TO LOAD REGISTRY]
     </div>
@@ -294,7 +311,7 @@ function ModelSelect({ models, selected, onSelect, loading, connected }) {
       style={{
         width: '100%', padding: '10px 16px', background: '#FFF', 
         border: '2px solid var(--accent)', borderRadius: 0,
-        fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
+        fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700,
         color: 'var(--text)', cursor: 'pointer', outline: 'none'
       }}
     >

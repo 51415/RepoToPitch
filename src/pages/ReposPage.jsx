@@ -7,8 +7,31 @@ import { getOS } from '../lib/folderUtils'
 
 function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMaxDepth }) {
   const { activeRepoId, setActiveRepoId, tasks } = useStore()
-  const open = activeRepoId === repo.id || (repo.treeData.length === 0 && activeRepoId === null)
+  const open = activeRepoId === repo.id
   const isGenerating = tasks.some(t => t.status === 'active')
+  const [collapsed, setCollapsed] = useState(new Set())
+
+  const toggleCollapse = (path) => {
+    const next = new Set(collapsed)
+    if (next.has(path)) next.delete(path)
+    else next.add(path)
+    setCollapsed(next)
+  }
+
+  const expandAll = () => setCollapsed(new Set())
+  const collapseAll = () => {
+    const all = new Set()
+    const walk = (nodes) => {
+      nodes.forEach(n => {
+        if (n.kind === 'directory') {
+          all.add(n.path)
+          if (n.children) walk(n.children)
+        }
+      })
+    }
+    walk(repo.treeData)
+    setCollapsed(all)
+  }
 
   const otherRepos = allRepos.filter(r => r.id !== repo.id && r.name)
   const toggleCalls = (id) => {
@@ -112,10 +135,16 @@ function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMa
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 48 }}>
             {/* Left Col: Tree Explorer */}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 12, height: 2, background: 'var(--accent)' }} />
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em', fontWeight: 800 }}>
-                  01 // PROJECT STRUCTURE
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 12, height: 2, background: 'var(--accent)' }} />
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em', fontWeight: 800 }}>
+                    01 // PROJECT STRUCTURE
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                   <Btn variant="secondary" size="sm" onClick={expandAll} style={{ fontSize: 9, padding: '4px 10px', height: 26 }}>EXPAND ALL</Btn>
+                   <Btn variant="secondary" size="sm" onClick={collapseAll} style={{ fontSize: 9, padding: '4px 10px', height: 26 }}>COLLAPSE ALL</Btn>
                 </div>
               </div>
               
@@ -128,6 +157,8 @@ function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMa
                     treeData={repo.treeData} 
                     onToggleIgnore={(path) => onToggleIgnore(repo.id, path)}
                     os={getOS()}
+                    collapsed={collapsed}
+                    onToggleCollapse={toggleCollapse}
                   />
                 ) : (
                   <div style={{ 
@@ -175,11 +206,16 @@ function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMa
       const role = await smartGuessRole(handle)
       addLog(`[System IO]: Role Detected -> [${(role || 'UNKNOWN').toUpperCase()}]`)
       
+      const newId = Math.random().toString(36).slice(2, 10)
       addRepo(role, {
+        id: newId,
         name: handle.name,
         treeData,
         handle // Store handle for later reading
       })
+      
+      // Auto-open the newly added repo
+      setActiveRepoId(newId)
       
       addLog(`[SYSTEM_IO]: SCAN COMPLETE. ${treeData.length} NODES INDEXED.`)
       addLog(`[SUCCESS]: RESOURCE COMMITTED TO STACK.`)

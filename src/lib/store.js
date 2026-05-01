@@ -117,6 +117,8 @@ export const useStore = create(
 
       showSettings: false,
       setShowSettings: (val) => set({ showSettings: val }),
+      settingsFlashCount: 0,
+      triggerSettingsFlash: () => set(s => ({ settingsFlashCount: s.settingsFlashCount + 1 })),
 
       autoPicker: false,
       setAutoPicker: (val) => set({ autoPicker: val }),

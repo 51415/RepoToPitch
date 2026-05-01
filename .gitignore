@@ -1,7 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-Cargo.lock
 
 # Build & Cache
 dist/
@@ -44,5 +42,15 @@ src-tauri/gen/
 src-tauri/bin/
 src-tauri/lib/
 
+# Generated Mobile & Store Icons (Too many files)
+src-tauri/icons/android/
+src-tauri/icons/ios/
+src-tauri/icons/Square*.png
+src-tauri/icons/StoreLogo.png
+
 # OS Specific
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Temporary Assets
+app_image.png
+app_favicon_small.png

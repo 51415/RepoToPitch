@@ -6,11 +6,11 @@
 
 ### Code to Clarity. Instantly.
 
-**The ultimate local-first deconstruction engine. Turn a codebase — even one spread across multiple repositories — into a professional Product Requirements Document and investor pitch deck. Runs natively on your machine with Tauri 2.0 and Ollama. Zero cloud. Zero tracking. No API keys. No one reads your code but you.**
+**The ultimate local-first deconstruction engine. Turn a codebase — even one spread across multiple repositories — into a professional Product Requirements Document and investor pitch deck. Runs natively on your machine with Tauri 2.0 and Ollama. Zero cloud. Zero tracking. No API keys required. Models are downloaded via Ollama's model library. Some models (e.g. Llama 3) may require a free HuggingFace account for direct downloads — Ollama handles this automatically where possible. No one reads your code but you.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open_Source-❤️-red)](CONTRIBUTING.md)
-[![Version](https://img.shields.io/badge/Version-1.0.1-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.2.1-blue)](CHANGELOG.md)
 [![Ollama](https://img.shields.io/badge/Runs_on-Ollama-indigo)](https://ollama.ai)
 [![Tauri](https://img.shields.io/badge/Built_with-Tauri_2.0-blue)](https://tauri.app)
 
@@ -43,6 +43,11 @@ It uses whatever local LLM you have running in Ollama — `llama3.2`, `qwen2.5`,
 
 ---
 # Pricing Section
+
+Insert this section into README.md after the "Who this is for" section
+and before "Quick Start".
+
+---
 
 ## Editions & Pricing
 
@@ -87,7 +92,7 @@ npm install
 ollama serve
 
 # 4. Pull a model
-ollama pull llama3.2        # recommended — fast, good quality
+ollama pull gemma4:e4b      # recommended — fast, good quality
 
 # 5. Run in Dev Mode (requires Rust)
 npm run tauri dev
@@ -122,6 +127,16 @@ tree /F
 
 All models work. `gemma4:e4b` is the recommended daily driver, while `qwen2.5-coder` excels at Step 2 (Repo Analysis).
 
+### IMPORTANT — Model Licensing
+Models have different licences for commercial use.
+
+- **Gemma (Google)** — free for commercial use up to certain usage thresholds. Recommended default.
+- **Qwen 2.5 (Alibaba)** — Apache 2.0, commercial use permitted.
+- **Llama 3 (Meta)** — requires accepting Meta's licence at [ollama.com/library/llama3](https://ollama.com/library/llama3). Review terms before commercial use.
+- **Mistral** — Apache 2.0, commercial use permitted.
+
+For consulting and client work, Gemma or Qwen are the safest default choices.
+
 ---
 
 ## Multi-repo support
@@ -148,8 +163,14 @@ See [repo_map.md](docs/repo_map.md) for a detailed codebase walkthrough.
 
 ## Requirements
 
-- **OS**: Windows (tested extensively). Supports macOS and Linux via Tauri (community-maintained, untested).
-- **Ollama**: Running locally (`ollama serve`). 8GB+ RAM recommended.
+### HARDWARE REQUIREMENTS
+- **RAM**: 8GB minimum (16GB recommended for 7B+ models)
+- **Storage**: 4–20GB per model depending on size
+- **GPU**: Optional but significantly faster. NVIDIA preferred. CPU inference works but expect 2–5 minutes per generation.
+- **OS**: Windows 10/11 (Desktop Edition)
+
+### SOFTWARE REQUIREMENTS
+- **Ollama**: Running locally (`ollama serve`).
 - **Rust (Dev only)**: Required for building from source.
 
 ---

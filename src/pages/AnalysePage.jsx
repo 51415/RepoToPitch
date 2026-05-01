@@ -39,10 +39,13 @@ function RepoAnalysisCard({ repo }) {
   const { 
     modelCode, modelArtifacts, customPrompts, 
     updateRepo, addDocument, removeDocument,
-    addTask, updateTask, removeTask, tasks, checkModels
+    addTask, updateTask, removeTask, tasks, checkModels,
+    activeAnalyseRepoId, setActiveAnalyseRepoId
   } = useStore()
   
-  const [activeTab, setActiveTab] = useState('documents') 
+  const open = activeAnalyseRepoId === repo.id
+  
+  const [activeTab, setActiveTab] = useState('overview') 
   const [loadingOverview, setLoadingOverview] = useState(false)
   const [loadingPrd, setLoadingPrd] = useState(false)
   const allRepos = useStore(s => s.repos)
@@ -51,9 +54,9 @@ function RepoAnalysisCard({ repo }) {
   const isThisRepoGenerating = tasks.some(t => t.id.includes(repo.id) && t.status === 'active')
 
   const TABS = [
-    { id: 'documents', label: 'Documents', done: repo.documents?.length > 0 },
     { id: 'overview', label: 'System Overview', done: !!repo.overview },
     { id: 'prd', label: 'Technical PRD', done: !!repo.prd },
+    { id: 'documents', label: 'Additional Information', done: repo.documents?.length > 0 },
   ]
 
   const handleFileUpload = async (e) => {
@@ -130,10 +133,10 @@ function RepoAnalysisCard({ repo }) {
   }
 
   return (
-    <div style={{ marginBottom: 64, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Header outside of card */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 8px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 12, height: 2, background: 'var(--accent)' }} />
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-2)', fontWeight: 800, letterSpacing: '0.1em' }}>
@@ -145,61 +148,72 @@ function RepoAnalysisCard({ repo }) {
               </Tag>
             )}
           </div>
-          <TabBar tabs={TABS} activeId={activeTab} onChange={setActiveTab} />
+          <Btn variant="secondary" size="sm" onClick={() => setActiveAnalyseRepoId(open ? null : repo.id)} style={{ width: 32, height: 28, padding: 0, justifyContent: 'center', fontSize: '14px', fontWeight: 800 }}>
+            {open ? '—' : '+'}
+          </Btn>
         </div>
 
-        <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-          {activeTab === 'overview' && (
-            <Btn variant="primary" size="sm" onClick={runOverview} loading={loadingOverview} disabled={isGenerating && !loadingOverview}>
-              {repo.overview ? 'Regenerate Analysis' : 'Run Analysis'}
-            </Btn>
-          )}
-          {activeTab === 'prd' && (
-            <Btn variant="primary" size="sm" onClick={runPrd} loading={loadingPrd} disabled={(isGenerating && !loadingPrd) || !repo.overview}>
-              {repo.prd ? 'Regenerate PRD' : 'Gen PRD'}
-            </Btn>
-          )}
-          {(activeTab === 'overview' && repo.overview) || (activeTab === 'prd' && repo.prd) ? (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <CopyBtn text={activeTab === 'overview' ? repo.overview : repo.prd} />
-              <Btn variant="secondary" size="sm" onClick={async () => {
-                const title = activeTab === 'overview' ? 'System Overview' : 'Technical PRD'
-                const content = activeTab === 'overview' ? repo.overview : repo.prd
-                await exportAsPDF(title, content, `${repo.name}-${activeTab}.pdf`)
-              }}>PDF</Btn>
-              <Btn variant="secondary" size="sm" onClick={async () => {
-                const content = activeTab === 'overview' ? repo.overview : repo.prd
-                await exportAsMarkdown(content, `${repo.name}-${activeTab}.md`)
-              }}>MD</Btn>
-            </div>
-          ) : null}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <TabBar tabs={TABS} activeId={activeTab} onChange={setActiveTab} />
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 20 }}>
+            {open && (
+              <>
+                {activeTab === 'overview' && (
+                  <Btn variant="primary" size="sm" onClick={runOverview} loading={loadingOverview} disabled={isGenerating && !loadingOverview} style={{ padding: '4px 12px', fontSize: 11 }}>
+                    {repo.overview ? 'Regenerate Analysis' : 'Run Analysis'}
+                  </Btn>
+                )}
+                {activeTab === 'prd' && (
+                  <Btn variant="primary" size="sm" onClick={runPrd} loading={loadingPrd} disabled={(isGenerating && !loadingPrd) || !repo.overview} style={{ padding: '4px 12px', fontSize: 11 }}>
+                    {repo.prd ? 'Regenerate PRD' : 'Gen PRD'}
+                  </Btn>
+                )}
+                {(activeTab === 'overview' && repo.overview) || (activeTab === 'prd' && repo.prd) ? (
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <CopyBtn text={activeTab === 'overview' ? repo.overview : repo.prd} style={{ padding: '4px 12px', fontSize: 11 }} />
+                    <Btn variant="secondary" size="sm" onClick={async () => {
+                      const title = activeTab === 'overview' ? 'System Overview' : 'Technical PRD'
+                      const content = activeTab === 'overview' ? repo.overview : repo.prd
+                      await exportAsPDF(title, content, `${repo.name}-${activeTab}.pdf`)
+                    }} style={{ padding: '4px 12px', fontSize: 11 }}>PDF</Btn>
+                    <Btn variant="secondary" size="sm" onClick={async () => {
+                      const content = activeTab === 'overview' ? repo.overview : repo.prd
+                      await exportAsMarkdown(content, `${repo.name}-${activeTab}.md`)
+                    }} style={{ padding: '4px 12px', fontSize: 11 }}>MD</Btn>
+                  </div>
+                ) : null}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <Card style={{ minHeight: 400, cursor: isThisRepoGenerating ? 'wait' : 'default' }}>
-        <div className="fade-in">
-          {activeTab === 'documents' && (
-             <div className="fade-in">
-                <div style={{ border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius)', padding: '24px', textAlign: 'center', background: 'var(--bg-1)', marginBottom: 20 }}>
-                  <input type="file" multiple onChange={handleFileUpload} style={{ display: 'none' }} id={`doc-u-${repo.id}`} />
-                  <label htmlFor={`doc-u-${repo.id}`} style={{ cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 900, color: 'var(--accent)' }}>
-                    + ATTACH CONTEXT DOCUMENTS
-                  </label>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {repo.documents?.map(d => (
-                    <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-1)', borderRadius: 6, border: '1px solid var(--border)' }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}>{d.name}</span>
-                      <button onClick={() => removeDocument(repo.id, d.name)} style={{ border: 'none', background: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 4 }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-             </div>
-          )}
-          {activeTab === 'overview' && <MarkdownView content={repo.overview} loading={loadingOverview} style={{ border: 'none', padding: 0, boxShadow: 'none' }} />}
-          {activeTab === 'prd' && <MarkdownView content={repo.prd} loading={loadingPrd} style={{ border: 'none', padding: 0, boxShadow: 'none' }} />}
-        </div>
-      </Card>
+      {open && (
+        <Card style={{ minHeight: 400, cursor: isThisRepoGenerating ? 'wait' : 'default' }}>
+          <div className="fade-in">
+            {activeTab === 'documents' && (
+               <div className="fade-in">
+                  <div style={{ border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius)', padding: '24px', textAlign: 'center', background: 'var(--bg-1)', marginBottom: 20 }}>
+                    <input type="file" multiple onChange={handleFileUpload} style={{ display: 'none' }} id={`doc-u-${repo.id}`} />
+                    <label htmlFor={`doc-u-${repo.id}`} style={{ cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 900, color: 'var(--accent)' }}>
+                      + ATTACH CONTEXT DOCUMENTS
+                    </label>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {repo.documents?.map(d => (
+                      <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-1)', borderRadius: 6, border: '1px solid var(--border)' }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}>{d.name}</span>
+                        <button onClick={() => removeDocument(repo.id, d.name)} style={{ border: 'none', background: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 4 }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+               </div>
+            )}
+            {activeTab === 'overview' && <MarkdownView content={repo.overview} loading={loadingOverview} style={{ border: 'none', padding: 0, boxShadow: 'none' }} />}
+            {activeTab === 'prd' && <MarkdownView content={repo.prd} loading={loadingPrd} style={{ border: 'none', padding: 0, boxShadow: 'none' }} />}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
@@ -208,7 +222,8 @@ function RepoAnalysisCard({ repo }) {
 export default function AnalysePage() {
   const { 
     repos, modelCode, modelArtifacts, customPrompts, 
-    updateRepo, addTask, updateTask, removeTask, checkModels, tasks 
+    updateRepo, addTask, updateTask, removeTask, checkModels, tasks,
+    setActiveAnalyseRepoId
   } = useStore()
   
   const analysedCount = repos.filter(r => r.overview).length
@@ -226,6 +241,7 @@ export default function AnalysePage() {
     for (const r of repos) {
       const taskId = taskMap[r.id]
       updateTask(taskId, { status: 'active' })
+      setActiveAnalyseRepoId(r.id) // Auto-open current repo being analysed
       const { system, prompt } = renderPrompt('repoOverview', {
         repo_name: r.name || 'unnamed',
         repo_role_type: r.role === 'frontend' ? 'FRONTEND' : 'BACKEND API',
@@ -263,6 +279,7 @@ export default function AnalysePage() {
       if (!r.overview) continue
       const taskId = taskMap[r.id]
       updateTask(taskId, { status: 'active' })
+      setActiveAnalyseRepoId(r.id) // Auto-open current repo being processed
       const { system, prompt } = renderPrompt('repoPrd', {
         repo_name: r.name || 'unnamed',
         repo_role_desc: r.role === 'frontend' ? 'frontend' : 'API service',
@@ -286,7 +303,7 @@ export default function AnalysePage() {
   }
 
   return (
-    <div style={{ padding: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: 32 }}>
+    <div style={{ padding: '0 0 40px 0', display: 'flex', flexDirection: 'column', gap: 32, cursor: isGenerating ? 'wait' : 'default' }}>
       <div>
         <SectionTitle
           title="Deep Analysis"
@@ -294,10 +311,10 @@ export default function AnalysePage() {
         />
 
         <div style={{ display: 'flex', gap: 12, marginTop: -20, marginBottom: 20 }}>
-           <Btn variant="primary" onClick={analyseAll} disabled={isGenerating}>
+           <Btn variant="primary" onClick={analyseAll} loading={isGenerating}>
              Analyse All ({repos.length})
            </Btn>
-           <Btn variant="secondary" onClick={generateAllPrds} disabled={isGenerating || analysedCount === 0}>
+           <Btn variant="secondary" onClick={generateAllPrds} loading={isGenerating} disabled={analysedCount === 0}>
              Generate All PRDs
            </Btn>
         </div>

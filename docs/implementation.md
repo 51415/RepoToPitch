@@ -64,3 +64,18 @@ The application employs a custom "Snow Premium" design system defined in `index.
 - **Typography**: A global baseline of `14px` with hierarchical scaling (+2px across all core tokens) ensures readability in high-density technical environments.
 - **Color Palette**: Uses a refined 'Snow' theme—clean whites, soft borders (`var(--border)`), and vibrant indigo accents (`var(--accent)`) to distinguish between code and synthesis results.
 - **Consistency**: Centralized `Btn`, `Card`, and `SectionTitle` components ensure that all workflow pages share a unified visual weight and architectural layout.
+
+## 8. Interaction Safeguards (Settings Lock)
+
+The navigation interceptor in `Sidebar.jsx` uses a centralized logic block:
+- **State Check**: Before executing any `onClick` or `Link` action, the system checks the `showSettings` state.
+- **Intervention**: If settings are open, the action is cancelled, and `triggerSettingsFlash()` is called.
+- **Animation Implementation**: The flash effect uses a CSS `@keyframe` pulse combined with inline style overrides (glow and scale) in `SettingsPage.jsx` to ensure high visibility even with complex backgrounds.
+
+## 9. Controlled Folder Explorer
+
+The migration of the repository tree to a controlled component allows for:
+- **External Triggers**: The "Expand All" and "Collapse All" buttons are implemented as secondary-variant `Btn` components in `ReposPage.jsx`.
+- **Recursive State Calculation**: The `collapseAll` function performs a full depth-first walk of the `treeData` object to pre-calculate all directory paths, ensuring the entire tree is collapsed with a single state update.
+- **Performance**: Managing the expansion set via a `Set` object provides O(1) lookups during tree rendering, maintaining 60fps even for deep nested structures.
+

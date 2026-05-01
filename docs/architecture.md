@@ -70,3 +70,18 @@ A library of structured system prompts designed for "Founder-First" narratives. 
 
 ## 4. Export Layer (`src/lib/exportUtils.js`)
 Uses browser-native libraries (`docx`, `pptxgenjs`, `jspdf`) to generate industry-standard artifacts without a backend.
+
+## 5. Interaction & Navigation Safeguards
+
+To prevent state corruption and accidental data loss, the application implements a global navigation lock:
+- **Settings Interceptor**: The `Sidebar` component wraps all project actions and navigation links in a `handleSidebarAction` interceptor. This blocks interaction while the Settings panel is active.
+- **Zustand-Triggered Feedback**: Navigation blocks trigger a `settingsFlashCount` increment in the store. The `SettingsPage` observes this count to trigger a "flash" pulse on the Close button, providing clear visual guidance on how to resume navigation.
+- **Component Class Support**: The core `Btn` component supports external `className` injection to facilitate these dynamic UI animations.
+
+## 6. Repository Management Explorer
+
+The repository explorer implements a "Controlled Tree" pattern:
+- **Lifting State**: The expansion/collapse state (`collapsed` Set) is managed in the `RepoCard` level.
+- **Global Actions**: This enables tree-wide commands like "Expand All" and "Collapse All" to be located prominently in the section headers, separate from the scrollable tree content.
+- **Independence**: Each repository card maintains its own independent expansion state, allowing users to manage complex multi-repo projects with granular control.
+

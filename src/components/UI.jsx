@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 // ── Button ─────────────────────────────────────────────────────────────────────
-export function Btn({ children, onClick, disabled, variant = 'primary', size = 'md', style = {}, title, loading = false }) {
+export function Btn({ children, onClick, disabled, variant = 'primary', size = 'md', style = {}, title, loading = false, className }) {
   const sizes = {
     sm: { padding: '6px 14px', fontSize: '12px' },
     md: { padding: '8px 18px', fontSize: '13px' },
@@ -43,6 +43,7 @@ export function Btn({ children, onClick, disabled, variant = 'primary', size = '
       onClick={onClick}
       disabled={isCurrentlyDisabled}
       title={title}
+      className={className}
       style={{
         borderRadius: 'var(--radius)',
         cursor: loading ? 'wait' : (disabled ? 'not-allowed' : 'pointer'),
@@ -239,7 +240,17 @@ export function MarkdownView({ content, loading, style = {} }) {
       )}
       {content && (
         <div className="md-content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content
+              .replace(/\$\s*([→↔←])\s*\$/g, '$1')
+              .replace(/\$\\(?:leftrightarrow|longleftrightarrow)\$/g, '↔')
+              .replace(/\$\\(?:rightarrow|longrightarrow)\$/g, '→')
+              .replace(/\$\\(?:leftarrow|longleftarrow)\$/g, '←')
+              .replace(/\\leftrightarrow/g, '↔')
+              .replace(/\\rightarrow/g, '→')
+              .replace(/\\leftarrow/g, '←')
+            }
+          </ReactMarkdown>
         </div>
       )}
     </div>
@@ -347,7 +358,7 @@ export function CopyBtn({ text, style = {} }) {
   }
   return (
     <Btn variant="secondary" size="sm" onClick={copy} style={style}>
-      {copied ? '[COPIED]' : '[COPY_OUTPUT]'}
+      {copied ? 'COPIED' : 'COPY'}
     </Btn>
   )
 }

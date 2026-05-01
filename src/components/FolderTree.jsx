@@ -1,15 +1,7 @@
 import { useState } from 'react'
+import { Btn } from './UI'
 
-export function FolderTree({ treeData, onToggleIgnore, os = 'unix' }) {
-  const [collapsed, setCollapsed] = useState(new Set())
-
-  const toggleCollapse = (path) => {
-    const next = new Set(collapsed)
-    if (next.has(path)) next.delete(path)
-    else next.add(path)
-    setCollapsed(next)
-  }
-
+export function FolderTree({ treeData, onToggleIgnore, os = 'unix', collapsed = new Set(), onToggleCollapse }) {
   const sep = os === 'windows' ? '\\' : '/'
 
   function renderNode(node, parentIgnored = false) {
@@ -27,7 +19,7 @@ export function FolderTree({ treeData, onToggleIgnore, os = 'unix' }) {
         }}>
           {isFolder ? (
             <button 
-              onClick={() => toggleCollapse(node.path)}
+              onClick={() => onToggleCollapse(node.path)}
               style={{ 
                 background: 'transparent', border: 'none', cursor: 'pointer', 
                 fontSize: 10, color: isIgnored ? '#ef4444' : '#22c55e', padding: 0, width: 12,
@@ -51,7 +43,7 @@ export function FolderTree({ treeData, onToggleIgnore, os = 'unix' }) {
             cursor: isFolder ? 'pointer' : 'default',
             fontWeight: isFolder ? 700 : 400,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-          }} onClick={() => isFolder && toggleCollapse(node.path)}>
+          }} onClick={() => isFolder && onToggleCollapse(node.path)}>
             {node.name}{isFolder ? sep : ''}
           </span>
 

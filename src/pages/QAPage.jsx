@@ -131,7 +131,7 @@ export default function QAPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <div style={{ width: 12, height: 2, background: 'var(--accent)' }} />
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-2)', fontWeight: 800, letterSpacing: '0.1em' }}>03 // KNOWLEDGE BASE</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-2)', fontWeight: 800, letterSpacing: '0.1em' }}>03 // ADDITIONAL INFORMATION</div>
             </div>
             
             <Card style={{ padding: '24px' }}>
@@ -147,6 +147,7 @@ export default function QAPage() {
                   <input type="file" multiple accept=".txt,.md,.pdf" onChange={handleFileUpload} style={{ display: 'none' }} id="global-doc-upload" />
                   <div style={{ fontSize: 24, marginBottom: 8 }}>📂</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 800, color: 'var(--accent)' }}>Upload Assets</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', marginTop: 4 }}>[ .txt, .md, .pdf only ]</div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

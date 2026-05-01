@@ -1,6 +1,6 @@
 <img src="../public/icons/main logo.png" width="200" alt="RepoToPitch" />
 
-# RepoToPitch — Documentation (v1.0.1)
+# RepoToPitch — Documentation (v1.2.1)
 
 ## Contents
 
@@ -21,6 +21,7 @@
 
 ### Prerequisites
 
+- **Hardware**: 8GB RAM minimum (16GB recommended for 7B+ models), 4–20GB storage per model, NVIDIA GPU preferred (CPU inference is supported but slower).
 - **Node.js 18+** — [nodejs.org](https://nodejs.org)
 - **Ollama** — [ollama.ai](https://ollama.ai) (free, runs locally)
 - At least one Ollama model pulled (see [Choosing Your Model](#choosing-your-model))
@@ -42,7 +43,7 @@ npm run tauri dev
 ### First run checklist
 
 - [ ] Ollama is running (`ollama serve` in a terminal)
-- [ ] At least one model is pulled (`ollama pull llama3.2`)
+- [ ] At least one model is pulled (`ollama pull gemma4:e4b`)
 - [ ] You have the `tree` output ready for at least one repo (see below)
 
 ---
@@ -58,6 +59,9 @@ Connect the app to your Ollama instance and select a model.
 - Select a model and click **Start**
 
 If Ollama is running on a different machine or port, change the host field before connecting.
+
+> [!IMPORTANT]
+> **Navigation Guard**: While the Settings panel is open, all other navigation and project actions in the sidebar are locked. If you attempt to click away, the **CLOSE [ESC]** button will flash to remind you to exit settings first.
 
 ---
 
@@ -238,6 +242,17 @@ All models supported by Ollama work. These are the ones tested:
 **Recommendation:** Use `gemma4:e4b` for daily synthesis. Switch to `qwen2.5-coder` for Step 2 (Repo Analysis).
 
 You can switch models between steps — use a fast model for overviews and a stronger model for the master PRD.
+
+### Model Licensing
+
+Models have different licences for commercial use. Ensure you review these terms if using RepoToPitch for client work:
+
+- **Gemma (Google)** — Free for commercial use up to certain usage thresholds.
+- **Qwen 2.5 (Alibaba)** — Apache 2.0, commercial use permitted.
+- **Llama 3 (Meta)** — Requires accepting Meta's licence terms.
+- **Mistral** — Apache 2.0, commercial use permitted.
+
+For consulting engagements, **Gemma** or **Qwen** are the recommended safe defaults.
 
 ---
 

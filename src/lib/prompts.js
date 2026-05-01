@@ -540,6 +540,6 @@ export function renderPrompt(key, context, customPrompts = {}) {
     prompt = prompt.replace(regex, v)
   })
 
-  const noLatexRule = "\nCRITICAL: Never use LaTeX math notation (e.g., $ightarrow$, \\rightarrow). Use standard Unicode symbols like →, ←, •, etc."
+  const noLatexRule = "\nCRITICAL: Never use LaTeX math notation (e.g., $\\rightarrow$, $\\leftrightarrow$, \\\\rightarrow). Use standard Unicode symbols like →, ↔, ←, •, etc. Your output is rendered as plain markdown, not LaTeX. DO NOT wrap arrows in dollar signs like $→$."
   return { system: system + noLatexRule, prompt }
 }

@@ -405,6 +405,7 @@ export default function MasterPage() {
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                <CopyBtn text={content} />
                <Btn variant="secondary" size="sm" onClick={() => exportAsPDF(activeTabObj.label, content, `${activeTabObj.id}.pdf`)} disabled={isGenerating}>PDF</Btn>
+               <Btn variant="secondary" size="sm" onClick={() => exportAsMarkdown(content, `${activeTabObj.id}.md`)} disabled={isGenerating}>MD</Btn>
             </div>
           )}
         </div>
