@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] — 2026-05-01
+### Export Engine Stabilization
+- **Nuclear Sanitization Engine**: Implemented an aggressive, multi-pass text-processing layer that purges Markdown artifacts (`**`, `__`, `` ` ``), LaTeX math delimiters (`$`), and Unicode artifacts from all exports.
+- **Typographic Stabilization**: Forced absolute character-spacing resets (`setCharSpace(0)`) for every line in PDF exports, eliminating "letter-spacing drift" and font-rendering glitches.
+- **High-Fidelity Interaction Maps**: Hardened the arrow-detection logic to normalize complex AI-generated sequences (e.g., `$ \leftrightarrow $`, `< - >`) into clean, ASCII-safe technical symbols.
+- **Bullet Deduplication**: Refined the list-prefix stripping regex across PPT, PDF, and Word modules to solve the "double-bullet" rendering issue.
+- **Version Verification**: Added a version-tagged footer to PDF exports to assist in deployment validation.
+
 ## [1.1.0] — 2026-05-01
 ### UI & Stability Overhaul
 - **Navigation Safeguards**: Implemented a global interceptor to block navigation/actions while settings are open, preventing state corruption.

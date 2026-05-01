@@ -193,7 +193,7 @@ Click **▶ Generate Pitch Deck** (requires Master PRD) to produce 10 high-fidel
 9. Roadmap
 10. The Ask
 
-Each slide includes bullets and speaker notes. Export as Markdown (for Canva, Figma, Google Slides) or JSON (for programmatic use). The system uses a high-resilience parsing engine to handle local LLM output inconsistencies.
+Each slide includes bullets and speaker notes. Export as Markdown (for Canva, Figma, Google Slides) or JSON (for programmatic use). The system uses a **High-Fidelity Sanitization Engine** to strip Markdown markers (`**`, `__`, `` ` ``), LaTeX noise (`$`), and Unicode artifacts, ensuring professional, clean formatting in every export.
 
 #### Repo PRDs
 Browse all per-repo PRDs in one place. Copy or download individually.

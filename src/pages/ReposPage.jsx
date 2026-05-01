@@ -132,8 +132,8 @@ function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMa
         <div className="fade-in">
           <div style={{ height: 1, background: 'var(--border)', margin: '0 -32px 24px -32px' }} />
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 48 }}>
-            {/* Left Col: Tree Explorer */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {/* Tree Explorer */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -170,11 +170,6 @@ function RepoCard({ repo, allRepos, onUpdate, onRemove, onToggleIgnore, globalMa
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Right Col: Metadata */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-               {/* Metadata removed from bottom to keep it on top */}
             </div>
           </div>
         </div>

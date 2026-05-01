@@ -69,7 +69,11 @@ A library of structured system prompts designed for "Founder-First" narratives. 
 6.  **Presentation Generation**: The Master PRD is transformed into a high-fidelity investor deck.
 
 ## 4. Export Layer (`src/lib/exportUtils.js`)
-Uses browser-native libraries (`docx`, `pptxgenjs`, `jspdf`) to generate industry-standard artifacts without a backend.
+Uses browser-native libraries (`docx`, `pptxgenjs`, `jspdf`) to generate industry-standard artifacts. This layer implements a **High-Fidelity Sanitization Engine**:
+- **Nuclear Purge**: A multi-pass text processor that aggressively strips Markdown artifacts (`**`, `__`, `` ` ``), LaTeX math delimiters (`$`), and Unicode whitespace artifacts.
+- **Typographic Stabilization**: Implements mandatory character-spacing resets (`setCharSpace(0)`) to prevent font-rendering glitches and "letter-spacing drift" common in browser-based PDF generation.
+- **Technical Symbol Normalization**: Automatically converts complex AI-generated sequences (e.g., `$\leftrightarrow$`) into clean, ASCII-safe technical symbols for professional interaction maps.
+- **Bullet Deduplication**: Ensures clean list rendering by stripping redundant Markdown markers before applying professional document styling.
 
 ## 5. Interaction & Navigation Safeguards
 

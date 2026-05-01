@@ -10,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open_Source-❤️-red)](CONTRIBUTING.md)
-[![Version](https://img.shields.io/badge/Version-1.2.1-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.1.1-blue)](CHANGELOG.md)
 [![Ollama](https://img.shields.io/badge/Runs_on-Ollama-indigo)](https://ollama.ai)
 [![Tauri](https://img.shields.io/badge/Built_with-Tauri_2.0-blue)](https://tauri.app)
 
@@ -153,7 +153,7 @@ RepoToPitch is built on a **Native Desktop / Local-First AI** architecture:
 - **Tauri 2.0 Core**: High-performance Rust backend providing secure filesystem access and native window management.
 - **Ollama Fallback**: Automatically detects and adapts to your local LLM configuration.
 - **Hierarchical Synthesis Engine**: Breaks large artifacts (like pitch decks) into atomic sub-tasks to ensure stability on local models.
-- **Custom Prompts**: Full control over the 'brain' of the app—edit templates directly to tailor output style and depth.
+- **High-Fidelity Export Engine**: Multi-pass sanitization layer that purges Markdown artifacts and LaTeX noise, with absolute typographic stabilization for investor-ready artifacts.
 - **Snow Premium UI**: A high-fidelity, light-mode interface designed for deep focus and executive clarity.
 - **Batch Synthesis**: Generate all project artifacts (PRD, GTM, Arch) with a single click.
 

@@ -3042,7 +3042,7 @@ dependencies = [
 
 [[package]]
 name = "repotopitch"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "log",
  "serde",
