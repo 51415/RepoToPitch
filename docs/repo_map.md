@@ -14,7 +14,7 @@ This document provides a high-level overview of the codebase structure for devel
 │   │   ├── Sidebar.jsx # Navigation sidebar with step tracking
 │   │   └── UI.jsx      # 'Snow Premium' atomic design (Btn, Card, Tag, Spinner)
 │   ├── lib/            # Core business logic and utilities
-│   │   ├── exportUtils.js  # Document generation (DOCX, PDF, PPTX, JSON)
+│   │   ├── exportUtils.js  # High-Fidelity generation with Nuclear Sanitization
 │   │   ├── tauriUtils.js   # Native File System bridge (Tauri API)
 │   │   ├── jsonUtils.js    # High-resilience JSON extraction and repair
 │   │   ├── ollama.js       # API client with fallback logic
@@ -22,7 +22,7 @@ This document provides a high-level overview of the codebase structure for devel
 │   │   └── store.js        # Global state with native persistence
 │   ├── pages/          # Main application views (Step-based)
 │   │   ├── SettingsPage.jsx # Step 0: Ollama & Model selection
-│   │   ├── ReposPage.jsx    # Step 1: Native repo management & scanning
+│   │   ├── ReposPage.jsx    # Step 1: Controlled Tree scanning & management
 │   │   ├── AnalysePage.jsx  # Step 2: Per-repo technical deconstruction
 │   │   ├── QAPage.jsx       # Step 3: Strategic context session
 │   │   ├── MasterPage.jsx   # Step 4: Hierarchical synthesis engine
@@ -37,8 +37,9 @@ This document provides a high-level overview of the codebase structure for devel
 2.  **Ollama Robustness**: The `ollama.js` client automatically detects and adapts to the local environment, providing a zero-config bridge for LLM inference.
 3.  **Snow Premium Design**: The UI follows a strict "Snow Premium" aesthetic—high-fidelity light mode with centralized atomic components in `UI.jsx`.
 4.  **Hierarchical Synthesis**: Repositories are analyzed technical-first, then merged with strategic founder context to produce a unified Master PRD.
-5.  **Direct-to-Artifact Export**: Programmatically generates professional artifacts (DOCX, PDF, PPTX) directly in the webview, keeping the app lightweight and fast.
+5.  **High-Fidelity Sanitization Layer**: Implements a multi-pass 'Nuclear Purge' that strips Markdown/LaTeX noise and stabilizes PDF typography for investor-ready results.
 6.  **Iterative Synthesis Engine**: Complex generations are broken into atomic sub-tasks to ensure stability on local models and hardware.
+7.  **Controlled Tree Pattern**: Repository explorers use a lifted-state pattern to provide global Expand/Collapse control and independent directory management.
 
 ## Platform Support
 RepoToPitch is a **Standalone Desktop Application** built on Tauri 2.0. It is optimized for **Windows**, with cross-platform support for macOS and Linux enabled by its Rust/Webview architecture.
