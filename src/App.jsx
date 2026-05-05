@@ -8,6 +8,7 @@ import QAPage from './pages/QAPage'
 import MasterPage from './pages/MasterPage'
 import PitchPage from './pages/PitchPage'
 import { Btn } from './components/UI'
+import { useLicence } from './hooks/useLicence'
 
 const PAGES = [Dashboard, ReposPage, AnalysePage, QAPage, MasterPage, PitchPage]
 
@@ -16,6 +17,7 @@ export default function App() {
     currentStep, setStep, showSettings, repos, isDirty, projectName, saveProject,
     currentProjectId, analysedCount, masterPrd
   } = useStore()
+  const { status } = useLicence()
 
   const Page = PAGES[currentStep] || Dashboard
 
@@ -60,9 +62,9 @@ export default function App() {
           fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700,
           letterSpacing: '0.05em'
         }}>
-          Open Source Project by Anuraag Jain of Growth Variable. Connect on LinkedIn:
+          Licensed {status.tier === 'community' ? 'Community Edition' : status.tier.charAt(0).toUpperCase() + status.tier.slice(1)} · 
           <a href="http://www.linkedin.com/in/anuraagjain" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', marginLeft: 6, textDecoration: 'none' }}>
-            http://www.linkedin.com/in/anuraagjain
+            Connect on LinkedIn
           </a>
         </footer>
 

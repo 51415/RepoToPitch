@@ -1,6 +1,6 @@
 <img src="../public/icons/main logo.png" width="200" alt="RepoToPitch" />
 
-# RepoToPitch — Documentation (v1.2.1)
+# RepoToPitch — Documentation (v1.1.1)
 
 ## Contents
 
@@ -289,7 +289,7 @@ Every document type in RepoToPitch has a prompt that drives its output. In the P
 
 **Why this matters:** A risk register for a fintech client needs to surface regulatory and compliance language. A health tech PRD needs MHRA and data governance framing. A SaaS product needs different KPI language to an internal enterprise platform. The default prompts are tuned for general use. Custom prompts make every output feel like it was written for your client's specific world.
 
-**How to use it:** In Settings, scroll to the Prompt Library section. Each document type (Repo Overview, Module Analysis, Repo PRD, Master PRD, Pitch Deck, and all Synthesis artifacts) has an editable prompt field. Edit, save, and all subsequent generations use your version. You can reset to default at any time.
+**How to use it:** In Settings, select the **PROMPTS** tab. Each document type (Repo Overview, Module Analysis, Repo PRD, Master PRD, Pitch Deck, and all Synthesis artifacts) has an editable prompt field. Edit, save, and all subsequent generations use your version. Use the **RESET TO DEFAULT** link at any time to revert a specific prompt to its factory settings.
 
 **Tip:** Start by editing the Master PRD prompt. Add a line like: *"This document is for a regulated financial services business. Flag any compliance, audit trail, or data residency considerations explicitly."* The difference in output quality is immediate.
 

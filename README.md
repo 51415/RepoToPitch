@@ -170,7 +170,7 @@ See [repo_map.md](docs/repo_map.md) for a detailed codebase walkthrough.
 - **RAM**: 8GB minimum (16GB recommended for 7B+ models)
 - **Storage**: 4–20GB per model depending on size
 - **GPU**: Optional but significantly faster. NVIDIA preferred. CPU inference works but expect 2–5 minutes per generation.
-- **OS**: Windows 10/11 (Desktop Edition)
+- **OS**: Windows 10/11, macOS 10.15+, Linux
 
 ### SOFTWARE REQUIREMENTS
 - **Ollama**: Running locally (`ollama serve`).
@@ -228,10 +228,6 @@ OLLAMA_ORIGINS="*" ollama serve
 npm run build        # Build frontend
 npm run tauri build  # Build native EXE (requires Rust/WiX)
 ```
-
-> [!NOTE]
-> The application uses a custom internal port mapping on **4029** for the development environment.
-
 
 ---
 

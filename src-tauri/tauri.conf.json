@@ -12,11 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "R2P",
-        "width": 1200,
+        "title": "RepoToPitch",
+        "width": 1280,
         "height": 1300,
-        "minWidth": 1024,
-        "minHeight": 768,
         "resizable": true,
         "fullscreen": false
       }
@@ -37,6 +35,9 @@
     ]
   },
   "plugins": {
-    "fs": {}
+    "dialog": null,
+    "fs": null,
+    "http": null,
+    "log": null
   }
 }
