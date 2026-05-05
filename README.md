@@ -8,6 +8,8 @@
 
 **The ultimate local-first deconstruction engine. Turn a codebase — even one spread across multiple repositories — into a professional Product Requirements Document and investor pitch deck. Runs natively on your machine with Tauri 2.0 and Ollama. Zero cloud. Zero tracking. No API keys required. Models are downloaded via Ollama's model library. Some models (e.g. Llama 3) may require a free HuggingFace account for direct downloads — Ollama handles this automatically where possible. No one reads your code but you.**
 
+[![Quick Overview](thumbnail.png)](https://www.loom.com/share/38d71988a5074eb0bc83e45f9f4a4c1b)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Open Source](https://img.shields.io/badge/Open_Source-❤️-red)](CONTRIBUTING.md)
 [![Version](https://img.shields.io/badge/Version-1.1.1-blue)](CHANGELOG.md)
