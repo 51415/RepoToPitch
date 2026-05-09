@@ -1,38 +1,64 @@
-// src/hooks/useLicence.jsx
-// PUBLIC STUB — Hardcoded for Community Edition
-import React, { createContext, useContext, useState } from "react";
+import { useState, useEffect, createContext, useContext } from 'react'
+import { invoke } from '@tauri-apps/api/core'
 
-const LicenceContext = createContext(null);
+const LicenceContext = createContext()
 
 export function LicenceProvider({ children }) {
-  // Hardcoded Community Status for Open Source
-  const [status] = useState({
-    tier: 'community',
-    activated: false,
-    deep_dive_bundled: false,
-    report_brand_price: 0
-  });
-
-  const activate = async () => { 
-    console.warn("Activation logic is only available in the commercial Desktop/Pro editions."); 
-  };
-  
-  const deactivate = async () => {};
-  const activatePlugin = async () => {};
-
+  const licence = useLicenceSource()
   return (
-    <LicenceContext.Provider value={{ status, activate, deactivate, activatePlugin, loading: false, error: null }}>
+    <LicenceContext.Provider value={licence}>
       {children}
     </LicenceContext.Provider>
-  );
+  )
 }
 
 export function useLicence() {
-  const ctx = useContext(LicenceContext);
-  if (!ctx) throw new Error("useLicence must be used within LicenceProvider");
-  return ctx;
+  const context = useContext(LicenceContext)
+  return context || {}
 }
 
-export function RequiresTier({ tier, children, fallback }) {
-  return tier === 'community' ? <>{children}</> : <>{fallback}</>;
+function useLicenceSource() {
+  const [status, setStatus] = useState({
+    tier: 'community',
+    activated: false,
+    deep_dive_bundled: false,
+    plugins_enabled: true
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    refreshStatus()
+  }, [])
+
+  const refreshStatus = async () => {
+    try {
+      setLoading(true)
+      const res = await invoke('get_licence_status')
+      setStatus(res)
+    } catch (e) {
+      console.error('[licence] Failed to get status:', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const activatePlugin = async (pluginId, key) => {
+    try {
+      setLoading(true)
+      await invoke('activate_plugin_licence', { pluginId, key })
+      await refreshStatus()
+      return true
+    } catch (e) {
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return {
+    status,
+    loading,
+    activatePlugin,
+    refreshStatus
+  }
 }

@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { Btn, Input } from '../components/UI'
 import { DEFAULT_PROMPTS } from '../lib/prompts'
 import { useLicence } from '../hooks/useLicence'
+import { open } from '@tauri-apps/plugin-shell'
 
 export default function SettingsPage() {
   const {
@@ -458,19 +459,17 @@ export default function SettingsPage() {
                   <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 4 }}>PRO EDITION</div>
                   <p style={{ fontSize: 11, color: 'var(--text-3)', margin: 0 }}>The ultimate tool for agencies and teams. Includes all plugins.</p>
                 </div>
-                <a
-                  href="https://growthvariable.com/repotopitch"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Btn 
+                  onClick={() => open('https://repotopitch.lemonsqueezy.com/')}
                   style={{
                     display: 'block', textAlign: 'center', padding: '12px',
                     background: 'var(--accent)', color: '#FFF', textDecoration: 'none',
                     fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 900,
-                    marginTop: 8
+                    marginTop: 8, width: '100%'
                   }}
                 >
                   VISIT STORE
-                </a>
+                </Btn>
               </div>
             </div>
 

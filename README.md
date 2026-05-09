@@ -51,7 +51,11 @@ It uses whatever local LLM you have running in Ollama — `llama3.2`, `qwen2.5`,
 
 RepoToPitch is open source. The source code is free and always will be.
 
-The paid editions exist for one reason: most consultants and CTOs do not want to spend an afternoon installing Rust, configuring a build environment, and debugging compiler errors before they can run a tool. The Desktop and Pro editions are pre-built, tested installers that work immediately.
+### Paid Editions (Desktop & Pro)
+
+If you want a pre-built Windows application that just works — no Rust compiler, no build environment, no setup beyond installing Ollama — you can purchase a licence for the Desktop or Pro editions.
+
+→ [Visit the RepoToPitch Store](https://repotopitch.lemonsqueezy.com/)
 
 | | Community | Desktop | Pro |
 |---|---|---|---|

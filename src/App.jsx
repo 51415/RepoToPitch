@@ -62,7 +62,7 @@ export default function App() {
           fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700,
           letterSpacing: '0.05em'
         }}>
-          Licensed {status.tier === 'community' ? 'Community Edition' : status.tier.charAt(0).toUpperCase() + status.tier.slice(1)} · 
+          Community Edition · 
           <a href="http://www.linkedin.com/in/anuraagjain" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', marginLeft: 6, textDecoration: 'none' }}>
             Connect on LinkedIn
           </a>

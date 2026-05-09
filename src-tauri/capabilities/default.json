@@ -27,6 +27,13 @@
       "allow": [{ "path": "**", "recursive": true }]
     },
     "core:path:default",
+    "shell:default",
+    {
+      "identifier": "shell:allow-open",
+      "allow": [
+        { "url": "https://repotopitch.lemonsqueezy.com/**" }
+      ]
+    },
     "http:default",
     {
       "identifier": "http:allow-fetch",
