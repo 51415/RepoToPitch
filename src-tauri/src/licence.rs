@@ -5,6 +5,8 @@
 // Open Source version: Used for Plugin verification only.
 // Main app tier is always Community in this build.
 
+#![allow(dead_code)]
+
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use chrono::{DateTime, Utc};

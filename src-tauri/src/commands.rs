@@ -1,4 +1,3 @@
-use crate::licence::Tier;
 use crate::LicenceState;
 use tokio::sync::Mutex;
 

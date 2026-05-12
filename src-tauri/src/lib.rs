@@ -1,7 +1,7 @@
 mod licence;
 mod commands;
 
-use licence::{Tier, LicenceError};
+use licence::Tier;
 use tokio::sync::Mutex;
 
 pub struct LicenceState {
