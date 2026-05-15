@@ -12,9 +12,8 @@ The `extractJson` utility in `src/lib/jsonUtils.js` is the backbone of the syste
     *   Removes trailing commas which cause native `JSON.parse` to fail.
     *   Detects `INCOMPLETE_JSON_STRUCTURE` or `INCOMPLETE_ARRAY` errors, which are then surfaced to the UI as truncation warnings.
 
-    *   Detects `INCOMPLETE_JSON_STRUCTURE` or `INCOMPLETE_ARRAY` errors, which are then surfaced to the UI as truncation warnings.
-
 ## 2. Iterative Synthesis Engine (Context Window Optimization)
+
 
 To handle complex projects with large context requirements on local LLMs (Ollama), the system implements a strict chunking and iterative strategy:
 
@@ -42,12 +41,15 @@ Task monitoring is handled via the `addTask` and `updateTask` methods in `src/li
 - **State Cleanliness**: Adding a new task automatically purges stale `error` states from the system.
 - **UI Visibility**: Real-time progress is visible in the sidebar task queue, providing transparency for long-running AI synthesis operations.
 
-## 5. Local Export Pipeline
+## 5. Unified Native Synthesis Engine
+Exports are handled by `src/lib/exportUtils.js` using a hybrid approach that prioritizes native fidelity:
+- **Hardened COM Bridge**: If Microsoft Office is detected, the system uses a PowerShell-backed COM bridge to generate DOCX, PPTX, and PDF files. This ensures 100% formatting parity and professional-grade layout.
+- **Template-Less Native Export**: Enables the generation of branded artifacts from scratch by directly manipulating the Office Object Model, bypassing the need for external template files.
+- **Fallback Pipeline**: For systems without Office, the app falls back to browser-native libraries:
+    - **docx**: For structural Word document generation.
+    - **pptxgenjs / JSZip**: For XML-injected PowerPoint generation.
+    - **LibreOffice CLI**: For high-fidelity PDF conversion via the `soffice` command if available.
 
-Exports are handled by `src/lib/exportUtils.js` using:
-- **docx**: For structural Word document generation.
-- **pptxgenjs**: For programmatic PowerPoint slide creation.
-- **jspdf**: For generating high-quality PDFs of both the PRDs and the Pitch Deck.
 
 ## 6. Tauri Native Bridge (`src/lib/tauriUtils.js`)
 

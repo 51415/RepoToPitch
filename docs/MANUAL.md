@@ -24,17 +24,22 @@
 - **Hardware**: 8GB RAM minimum (16GB recommended for 7B+ models), 4–20GB storage per model, NVIDIA GPU preferred (CPU inference is supported but slower).
 - **Node.js 18+** — [nodejs.org](https://nodejs.org)
 - **Ollama** — [ollama.ai](https://ollama.ai) (free, runs locally)
+- **Microsoft Office** (Word/PowerPoint) OR **LibreOffice** (v7.0+ recommended): Required for high-fidelity DOCX, PPTX, and PDF exports.
 - At least one Ollama model pulled (see [Choosing Your Model](#choosing-your-model))
+
+
+
 
 ### Installation (User)
 
-1. **Download the latest release**: Grab the `.exe` (Windows) from the [Releases](https://github.com/anuraagjain/repo-to-pitch/releases) page.
+1. **Download the latest release**: Grab the `.exe` (Windows) from the [Releases](https://github.com/51415/repo-to-pitch/releases) page.
 2. **Install & Run**: Launch the application.
 
 ### Installation (Developer)
 
+
 ```bash
-git clone https://github.com/anuraagjain/repo-to-pitch.git
+git clone https://github.com/51415/repo-to-pitch.git
 cd repo-to-pitch
 npm install
 npm run tauri dev
@@ -279,6 +284,8 @@ The raw structured data. Each slide object contains `title`, `subtitle`, `bullet
 
 ---
 
+
+
 ## Pro Edition Features
 
 The Pro Edition adds three capabilities designed specifically for consultants and fractional CTOs delivering client work.
@@ -331,6 +338,7 @@ Every Pro licence includes a 30-minute onboarding call with Anuraag Jain and 90 
 ---
 
 ## Prompts Reference
+
 
 All prompts are in `src/lib/prompts.js`. You can edit them directly to change the output style, add constraints, or tailor the format to your needs.
 

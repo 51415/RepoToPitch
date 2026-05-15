@@ -69,11 +69,22 @@ A library of structured system prompts designed for "Founder-First" narratives. 
 6.  **Presentation Generation**: The Master PRD is transformed into a high-fidelity investor deck.
 
 ## 4. Export Layer (`src/lib/exportUtils.js`)
-Uses browser-native libraries (`docx`, `pptxgenjs`, `jspdf`) to generate industry-standard artifacts. This layer implements a **High-Fidelity Sanitization Engine**:
+
+Uses browser-native libraries (`docx`, `pptxgenjs`, `jspdf`) combined with a **Unified Native Synthesis Engine** to generate industry-standard artifacts. 
+
+### 4.1 Unified Native Synthesis (v1.1.2)
+For environments with Microsoft Office installed, the system bypasses browser-level generation and utilizes a **Hardened COM Bridge**:
+- **Standardized Parity**: DOCX, PPTX, and PDF exports all leverage the same native Office synthesis engine, ensuring 100% visual parity across all formats.
+- **Template-Less Export**: The system can generate professional, branded documents from scratch without requiring external `.dotx` or `.potx` files by utilizing Office's internal document models.
+- **Robust Automation**: Implements a "InvokeMember" pattern with deep PowerShell integration to handle cross-version Office differences and prevent automation crashes.
+
+### 4.2 High-Fidelity Sanitization Engine
+Regardless of the export pathway, all content passes through a multi-pass sanitization layer:
 - **Nuclear Purge**: A multi-pass text processor that aggressively strips Markdown artifacts (`**`, `__`, `` ` ``), LaTeX math delimiters (`$`), and Unicode whitespace artifacts.
 - **Typographic Stabilization**: Implements mandatory character-spacing resets (`setCharSpace(0)`) to prevent font-rendering glitches and "letter-spacing drift" common in browser-based PDF generation.
 - **Technical Symbol Normalization**: Automatically converts complex AI-generated sequences (e.g., `$\leftrightarrow$`) into clean, ASCII-safe technical symbols for professional interaction maps.
 - **Bullet Deduplication**: Ensures clean list rendering by stripping redundant Markdown markers before applying professional document styling.
+
 
 ## 5. Interaction & Navigation Safeguards
 

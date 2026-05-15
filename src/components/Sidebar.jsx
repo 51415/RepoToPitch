@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useStore } from '../lib/store'
 import { Btn } from './UI'
-import { exportAsJSON, exportAsPptx, exportPitchAsPDF, exportAsMarkdown, exportAsPDF } from '../lib/exportUtils'
+import { exportAsJSON, exportAsPptx, exportPitchAsPDF, exportAsMarkdown } from '../lib/exportUtils'
 
 const STEPS = [
   { id: 0, label: 'Dashboard',    sub: 'PROJECTS', icon: '/icons/icon_workflow_full.png' },
@@ -31,9 +31,8 @@ export default function Sidebar() {
     tasks, masterPageTab, setMasterPageTab, pitchSlides, projectOverview,
     techArchitecture, goToMarket, competitivePositioning, riskRegister, 
     dataPrivacy, apiDocs, onboardingGuide,
-    addTask, updateTask, removeTask,
-    showSettings, setShowSettings, projectName, isDirty, saveProject, resetProject,
-    triggerSettingsFlash
+    showSettings, setShowSettings, projectName, isDirty, saveProject, 
+    newProject, openProject, closeProject, triggerSettingsFlash, brandConfig
   } = useStore()
 
   const handleSidebarAction = (action) => {
@@ -167,47 +166,46 @@ export default function Sidebar() {
             <>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-3)', marginTop: 20, fontWeight: 800, letterSpacing: '0.1em' }}>Project Name</div>
               <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text)', marginBottom: 20, letterSpacing: '0.02em' }}>{projectName || 'Unnamed Project'}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, width: '100%' }}>
                 <Btn 
                    variant="primary"
                    size="sm"
                    style={{ fontSize: 9, padding: '6px 10px', height: 28 }}
-                   onClick={() => handleSidebarAction(() => {
-                     if (isDirty) {
-                       if (!confirm('You have unsaved changes. Start new project?')) return
-                     }
-                     resetProject()
-                   })}
+                   onClick={async () => await newProject()}
                    disabled={isGenerating}
                 >
-                   New Project
+                   NEW
+                </Btn>
+                <Btn 
+                   variant="secondary"
+                   size="sm"
+                   style={{ fontSize: 9, padding: '6px 10px', height: 28 }}
+                   onClick={async () => await openProject()}
+                   disabled={isGenerating}
+                >
+                   OPEN
                 </Btn>
                 <Btn 
                    variant={isDirty ? "accent" : "secondary"} 
                    size="sm"
                    style={{ fontSize: 9, padding: '6px 10px', height: 28 }}
-                   onClick={() => handleSidebarAction(async () => { 
+                   onClick={async () => { 
                      let name = projectName;
-                     if (!name) name = prompt('Enter project name to save:'); 
+                     if (!name) name = window.prompt('Enter project name to save:'); 
                      if (name) await saveProject(name); 
-                   })}
+                   }}
                    disabled={isGenerating}
                 >
-                   {isDirty ? 'Save Changes*' : 'Project Saved'}
+                   {isDirty ? 'SAVE*' : 'SAVED'}
                 </Btn>
                 <Btn 
                    variant="secondary" 
                    size="sm" 
-                   style={{ fontSize: 10, padding: '6px 10px', height: 28, color: 'var(--text-3)', borderColor: 'var(--border-strong)' }}
-                   onClick={() => handleSidebarAction(() => {
-                     if (isDirty) {
-                       if (!confirm('You have unsaved changes. RE-INITIALISE will erase current progress. Continue?')) return
-                     }
-                     resetProject()
-                   })}
+                   style={{ fontSize: 9, padding: '6px 10px', height: 28, color: 'var(--text-3)', borderColor: 'var(--border-strong)' }}
+                   onClick={async () => await closeProject()}
                    disabled={isGenerating}
                 >
-                   Re-initialise
+                   {isDirty ? 'CLOSE*' : 'CLOSE'}
                 </Btn>
               </div>
             </>
@@ -360,7 +358,7 @@ export default function Sidebar() {
                       DOWNLOAD PDF
                     </div>
                     <div 
-                      onClick={() => handleSidebarAction(() => !isGenerating && pitchSlides.length > 0 && exportAsPptx(pitchSlides, 'pitch-deck.pptx'))}
+                      onClick={() => handleSidebarAction(() => !isGenerating && pitchSlides.length > 0 && exportAsPptx(pitchSlides, 'pitch-deck.pptx', brandConfig))}
                       style={{ 
                         fontSize: 9, fontFamily: 'var(--font-mono)', fontWeight: 700, 
                         color: (pitchSlides.length > 0) ? (isGenerating ? 'var(--text-3)' : 'var(--text-2)') : 'var(--text-3)', 
@@ -418,15 +416,19 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Section - Settings & Status */}
-      <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-1)', flexShrink: 0 }}>
+      <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-1)', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: isCollapsed ? '10px 0' : '10px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        </div>
         <button
           onClick={() => setShowSettings(!showSettings)}
+
           style={{
             width: '100%', padding: isCollapsed ? '20px 0' : '20px 24px', 
             border: 'none', background: showSettings ? 'var(--accent-soft)' : 'transparent',
             display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'flex-start',
             gap: 16, cursor: 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            borderBottom: '1px solid var(--border-dim)'
           }}
         >
           <img src="/icons/icon_settings_ai.png" style={{ width: 18, height: 18, opacity: showSettings ? 1 : 0.7 }} alt="settings" />

@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "RepoToPitch",
         "width": 1280,
         "height": 1300,
@@ -32,12 +33,18 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "../src/defaults/*"
     ]
+
   },
   "plugins": {
     "dialog": null,
     "fs": null,
     "http": null,
-    "log": null
+    "log": null,
+    "shell": null
   }
 }
+

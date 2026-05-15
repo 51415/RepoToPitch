@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] — 2026-05-15
+### Native Synthesis Stabilization
+- **Unified Native Engine**: Standardized Pitch and Synthesis PDF exports to use the exact same Native COM synthesis engine as PPTX, ensuring 100% formatting parity.
+- **Template-Less Native Export**: Decoupled MS Office synthesis from external template dependencies; the app now generates documents directly from scratch if Office is detected.
+- **Hardened COM Bridge**: Implemented "InvokeMember" patterns and PowerPoint-specific enums (DisplayAlerts/WithWindow) to resolve automation crashes across different Office versions.
+- **UI Standardization**: Reordered AnalysePage export buttons to (DOCX | PDF | MD) and restored Copy functionality to match the global synthesis UX.
+- **Enhanced Detection**: Expanded the dependency guard to recognize PowerPoint-only installations.
+
 ## [1.1.1] — 2026-05-01
 ### Export Engine Stabilization
 - **Nuclear Sanitization Engine**: Implemented an aggressive, multi-pass text-processing layer that purges Markdown artifacts (`**`, `__`, `` ` ``), LaTeX math delimiters (`$`), and Unicode artifacts from all exports.

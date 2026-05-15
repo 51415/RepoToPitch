@@ -3,7 +3,7 @@ import { streamChat } from '../lib/ollama'
 import { renderPrompt } from '../lib/prompts'
 import { useStore } from '../lib/store'
 import { Btn, Card, MarkdownView, SectionTitle, Spinner, CopyBtn, Tag, VerticalTabs, Textarea } from '../components/UI'
-import { exportAsMarkdown, exportAsJSON, exportAsDocx, exportAsPDF } from '../lib/exportUtils'
+import { exportAsMarkdown, exportAsJSON, exportAsDocx, exportAsPDF, exportAsPptx, exportPitchAsPDF } from '../lib/exportUtils'
 import { extractJson } from '../lib/jsonUtils'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -404,10 +404,12 @@ export default function MasterPage() {
           {content && activeTabObj.id !== 'pitch' && (
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                <CopyBtn text={content} />
+               <Btn variant="secondary" size="sm" onClick={() => exportAsDocx(activeTabObj.label, content, `${activeTabObj.id}.docx`)} disabled={isGenerating}>DOCX</Btn>
                <Btn variant="secondary" size="sm" onClick={() => exportAsPDF(activeTabObj.label, content, `${activeTabObj.id}.pdf`)} disabled={isGenerating}>PDF</Btn>
                <Btn variant="secondary" size="sm" onClick={() => exportAsMarkdown(content, `${activeTabObj.id}.md`)} disabled={isGenerating}>MD</Btn>
             </div>
           )}
+
         </div>
 
         {/* Content Area */}
@@ -439,24 +441,31 @@ export default function MasterPage() {
                     />
                   </div>
 
-                {pitchSlides.length > 0 ? (
+                 {pitchSlides.length > 0 ? (
                   <div className="fade-in">
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 24, background: 'var(--bg-1)', padding: 4, borderRadius: 'var(--radius)' }}>
-                      {pitchSlides.map((s, i) => (
-                        <button key={i} onClick={() => setActiveSlide(i)} style={{
-                          padding: '8px 12px', border: 'none',
-                          background: activeSlide === i ? 'var(--accent)' : 'transparent',
-                          color: activeSlide === i ? '#FFF' : 'var(--text-3)',
-                          fontFamily: 'var(--font-mono)', fontSize: 10, cursor: 'pointer', transition: 'all 0.1s',
-                          fontWeight: 800, borderRadius: 'var(--radius)'
-                        }}>
-                          {String(i + 1).padStart(2, '0')}
-                        </button>
-                      ))}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', background: 'var(--bg-1)', padding: 4, borderRadius: 'var(--radius)' }}>
+                        {pitchSlides.map((s, i) => (
+                          <button key={i} onClick={() => setActiveSlide(i)} style={{
+                            padding: '8px 12px', border: 'none',
+                            background: activeSlide === i ? 'var(--accent)' : 'transparent',
+                            color: activeSlide === i ? '#FFF' : 'var(--text-3)',
+                            fontFamily: 'var(--font-mono)', fontSize: 10, cursor: 'pointer', transition: 'all 0.1s',
+                            fontWeight: 800, borderRadius: 'var(--radius)'
+                          }}>
+                            {String(i + 1).padStart(2, '0')}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <Btn variant="secondary" size="sm" onClick={() => exportAsPptx(pitchSlides, 'pitch-deck.pptx')} disabled={isGenerating}>PPTX</Btn>
+                        <Btn variant="secondary" size="sm" onClick={() => exportPitchAsPDF(pitchSlides, 'pitch-deck.pdf')} disabled={isGenerating}>PDF</Btn>
+                      </div>
                     </div>
                     <SlideCard slide={pitchSlides[activeSlide]} index={activeSlide} total={pitchSlides.length} />
                   </div>
                 ) : (
+
                   <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)', borderRadius: 'var(--radius)', color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
                     [Awaiting synthesis of pitch slides]
                   </div>

@@ -1,5 +1,6 @@
-mod licence;
-mod commands;
+pub mod licence;
+pub mod commands;
+
 
 use licence::Tier;
 use tokio::sync::Mutex;
@@ -33,7 +34,9 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .invoke_handler(tauri::generate_handler![
             commands::get_licence_status,
-            commands::activate_plugin_licence
+            commands::activate_plugin_licence,
+            commands::deactivate_plugin_licence
+
         ])
         .setup(|app| {
             if cfg!(debug_assertions) {

@@ -37,9 +37,11 @@ This document provides a high-level overview of the codebase structure for devel
 2.  **Ollama Robustness**: The `ollama.js` client automatically detects and adapts to the local environment, providing a zero-config bridge for LLM inference.
 3.  **Snow Premium Design**: The UI follows a strict "Snow Premium" aesthetic—high-fidelity light mode with centralized atomic components in `UI.jsx`.
 4.  **Hierarchical Synthesis**: Repositories are analyzed technical-first, then merged with strategic founder context to produce a unified Master PRD.
-5.  **High-Fidelity Sanitization Layer**: Implements a multi-pass 'Nuclear Purge' that strips Markdown/LaTeX noise and stabilizes PDF typography for investor-ready results.
-6.  **Iterative Synthesis Engine**: Complex generations are broken into atomic sub-tasks to ensure stability on local models and hardware.
-7.  **Controlled Tree Pattern**: Repository explorers use a lifted-state pattern to provide global Expand/Collapse control and independent directory management.
+5.  **Unified Native Synthesis Engine**: v1.1.2 consolidation that leverages a hardened COM bridge to ensure DOCX, PPTX, and PDF formatting parity via Microsoft Office automation.
+6.  **High-Fidelity Sanitization Layer**: Implements a multi-pass 'Nuclear Purge' that strips Markdown/LaTeX noise and stabilizes PDF typography for investor-ready results.
+7.  **Iterative Synthesis Engine**: Complex generations are broken into atomic sub-tasks to ensure stability on local models and hardware.
+8.  **Controlled Tree Pattern**: Repository explorers use a lifted-state pattern to provide global Expand/Collapse control and independent directory management.
+
 
 ## Platform Support
 RepoToPitch is a **Standalone Desktop Application** built on Tauri 2.0. It is optimized for **Windows**, with cross-platform support for macOS and Linux enabled by its Rust/Webview architecture.

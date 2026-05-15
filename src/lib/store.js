@@ -90,6 +90,10 @@ export const useStore = create(
       apiDocs: '',
       onboardingGuide: '',
       masterPageTab: 'project-overview',
+      brandConfig: {},
+      setupComplete: false,
+
+
       
       setGlobalContext: (c) => set({ globalContext: c, isDirty: true }),
       setProjectOverview: (o) => set({ projectOverview: o, isDirty: true }),
@@ -110,6 +114,10 @@ export const useStore = create(
       setApiDocs: (a) => set({ apiDocs: a, isDirty: true }),
       setOnboardingGuide: (o) => set({ onboardingGuide: o, isDirty: true }),
       setMasterPageTab: (t) => set({ masterPageTab: t }),
+      setBrandConfig: (b) => set({ brandConfig: b }),
+      setSetupComplete: (val) => set({ setupComplete: val }),
+
+
       activeRepoId: null,
       setActiveRepoId: (id) => set({ activeRepoId: id }),
       activeAnalyseRepoId: null,
@@ -247,9 +255,122 @@ export const useStore = create(
           currentProjectId: project.id,
           projectFilePath: project.path || null,
           currentStep: 0,
-          isDirty: false
+          isDirty: false,
+          activeRepoId: null,
+          activeAnalyseRepoId: null
         })
       },
+
+      openProject: async () => {
+        try {
+          if (get().isDirty) {
+            try {
+              const { ask } = await import('@tauri-apps/plugin-dialog');
+              const confirmed = await ask('You have unsaved changes. Open another project?', {
+                title: 'Unsaved Changes',
+                kind: 'warning',
+                okLabel: 'Open Project',
+                cancelLabel: 'Cancel'
+              });
+              if (!confirmed) return;
+            } catch (e) {
+              if (!window.confirm('You have unsaved changes. Open another project?')) return;
+            }
+          }
+
+          const { open } = await import('@tauri-apps/plugin-dialog')
+          const selected = await open({
+            multiple: false,
+            filters: [{ name: 'Project', extensions: ['json'] }]
+          })
+
+          if (selected) {
+            const { readTextFile } = await import('@tauri-apps/plugin-fs')
+            const content = await readTextFile(selected)
+            const projectData = JSON.parse(content)
+            
+            if (!projectData || !projectData.data) {
+              throw new Error('Invalid project file format');
+            }
+
+            set(s => {
+              const filtered = s.projects.filter(p => p.id !== projectData.id)
+              const metadata = {
+                id: projectData.id,
+                name: projectData.name,
+                date: projectData.date,
+                path: selected
+              }
+              return {
+                projects: [metadata, ...filtered],
+                repos: projectData.data.repos,
+                qaAnswers: projectData.data.qaAnswers,
+                masterPrd: projectData.data.masterPrd,
+                pitchSlides: projectData.data.pitchSlides,
+                techArchitecture: projectData.data.techArchitecture || '',
+                competitivePositioning: projectData.data.competitivePositioning || '',
+                goToMarket: projectData.data.goToMarket || '',
+                riskRegister: projectData.data.riskRegister || '',
+                dataPrivacy: projectData.data.dataPrivacy || '',
+                apiDocs: projectData.data.apiDocs || '',
+                onboardingGuide: projectData.data.onboardingGuide || '',
+                projectOverview: projectData.data.projectOverview || '',
+                pitchInstructions: projectData.data.pitchInstructions || '',
+                globalContext: projectData.data.globalContext || '',
+                globalDocuments: projectData.data.globalDocuments || [],
+                customPrompts: projectData.data.customPrompts,
+                projectName: projectData.name,
+                currentProjectId: projectData.id,
+                projectFilePath: selected,
+                currentStep: 1, 
+                isDirty: false,
+                activeRepoId: null,
+                activeAnalyseRepoId: null
+              }
+            })
+          }
+        } catch (e) {
+          console.error('[OPEN] Failed to open project:', e)
+          alert(`Failed to open project: ${e.message || 'Unknown error'}`)
+        }
+      },
+
+      closeProject: async () => {
+        if (get().isDirty) {
+          try {
+            const { ask } = await import('@tauri-apps/plugin-dialog');
+            const confirmed = await ask('You have unsaved changes. Close current project?', {
+              title: 'Unsaved Changes',
+              kind: 'warning',
+              okLabel: 'Close Anyway',
+              cancelLabel: 'Stay'
+            });
+            if (!confirmed) return;
+          } catch (e) {
+            if (!window.confirm('You have unsaved changes. Close current project?')) return;
+          }
+        }
+        get().resetProject();
+      },
+      
+      newProject: async () => {
+        if (get().isDirty) {
+          try {
+            const { ask } = await import('@tauri-apps/plugin-dialog');
+            const confirmed = await ask('You have unsaved changes. Start new project?', {
+              title: 'Unsaved Changes',
+              kind: 'warning',
+              okLabel: 'New Project',
+              cancelLabel: 'Cancel'
+            });
+            if (!confirmed) return;
+          } catch (e) {
+            if (!window.confirm('You have unsaved changes. Start new project?')) return;
+          }
+        }
+        get().resetProject();
+      },
+
       
       deleteProject: (id) => set(s => ({ projects: s.projects.filter(p => p.id !== id) })),
 
@@ -336,7 +457,7 @@ export const useStore = create(
 
       resetProject: () => {
         set({
-          currentStep: 0,
+          currentStep: 1, 
           repos: [],
           qaAnswers: {},
           masterPrd: '',
@@ -357,8 +478,11 @@ export const useStore = create(
           globalContext: '',
           globalDocuments: [],
           projectOverview: '',
+          activeRepoId: null,
+          activeAnalyseRepoId: null
         })
       },
+
 
       resetSystem: () => {
         set({
@@ -379,6 +503,8 @@ export const useStore = create(
           modelCode: '',
           modelArtifacts: '',
           customPrompts: {},
+          brandConfig: {},
+
           autoPicker: false,
           showSettings: false
         })
@@ -392,6 +518,7 @@ export const useStore = create(
         modelArtifacts: s.modelArtifacts,
         ollamaHost: s.ollamaHost,
         customPrompts: s.customPrompts,
+        brandConfig: s.brandConfig,
         projects: s.projects 
       }),
     }

@@ -75,16 +75,17 @@ If you want a pre-built Windows application that just works — no Rust compiler
 
 ## Quick Start (User)
 
-1. **Download the latest release**: Grab the `.exe` (Windows) from the [Releases](https://github.com/anuraagjain/repo-to-pitch/releases) page.
+1. **Download the latest release**: Grab the `.exe` (Windows) from the [Releases](https://github.com/51415/repo-to-pitch/releases) page.
 2. **Install & Run**: Launch the application.
 3. **Connect Ollama**: Ensure Ollama is running locally (`ollama serve`).
 4. **Analyze**: Start adding your repositories.
 
-## Quick Start (Developer)
+## Getting Started (Build from Source)
+
 
 ```bash
 # 1. Clone
-git clone https://github.com/anuraagjain/repo-to-pitch.git
+git clone https://github.com/51415/repo-to-pitch.git
 cd repo-to-pitch
 
 # 2. Install deps
@@ -99,6 +100,7 @@ ollama pull gemma4:e4b      # recommended — fast, good quality
 # 5. Run in Dev Mode (requires Rust)
 npm run tauri dev
 ```
+
 
 ---
 
@@ -173,7 +175,10 @@ See [repo_map.md](docs/repo_map.md) for a detailed codebase walkthrough.
 
 ### SOFTWARE REQUIREMENTS
 - **Ollama**: Running locally (`ollama serve`).
-- **Rust (Dev only)**: Required for building from source.
+- **Microsoft Office** (Word/PowerPoint) OR **LibreOffice** (v7.0+ recommended): Required for high-fidelity DOCX, PPTX, and PDF exports.
+- **Rust (stable)**: Required for building from source.
+- **Node.js 18+**: Required for frontend development and tooling.
+
 
 ---
 
@@ -256,6 +261,8 @@ This tool came from watching the same pattern repeat: a technical founder with a
 If your situation is more complex than a tool can handle, [Growth Variable offers advisory engagements](https://www.growthvariable.com/services) for founders who need strategic clarity, not just better documents.
 
 📘 I also wrote **[Prompt Engineering the Subconscious](https://book.growthvariable.com)** — a framework for founders and executives who've hit an invisible ceiling. The technical architecture of AI turns out to be a precise metaphor for how the mind actually works under pressure.
+
+
 
 ---
 

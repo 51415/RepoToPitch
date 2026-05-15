@@ -3,7 +3,7 @@ import { streamChat } from '../lib/ollama'
 import { renderPrompt } from '../lib/prompts'
 import { useStore } from '../lib/store'
 import { Btn, Card, Textarea, MarkdownView, SectionTitle, Tag, CopyBtn } from '../components/UI'
-import { exportAsMarkdown, exportAsPDF } from '../lib/exportUtils'
+import { exportAsMarkdown, exportAsPDF, exportAsDocx } from '../lib/exportUtils'
 
 // ── Horizontal Tabs Component (Internal to Analyse) ──────────────────────────
 function TabBar({ tabs, activeId, onChange }) {
@@ -171,6 +171,11 @@ function RepoAnalysisCard({ repo }) {
                 {(activeTab === 'overview' && repo.overview) || (activeTab === 'prd' && repo.prd) ? (
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     <CopyBtn text={activeTab === 'overview' ? repo.overview : repo.prd} style={{ padding: '4px 12px', fontSize: 11 }} />
+                    <Btn variant="secondary" size="sm" onClick={async () => {
+                      const title = activeTab === 'overview' ? 'System Overview' : 'Technical PRD'
+                      const content = activeTab === 'overview' ? repo.overview : repo.prd
+                      await exportAsDocx(title, content, `${repo.name}-${activeTab}.docx`)
+                    }} style={{ padding: '4px 12px', fontSize: 11 }}>DOCX</Btn>
                     <Btn variant="secondary" size="sm" onClick={async () => {
                       const title = activeTab === 'overview' ? 'System Overview' : 'Technical PRD'
                       const content = activeTab === 'overview' ? repo.overview : repo.prd

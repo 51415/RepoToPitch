@@ -1,6 +1,7 @@
 import { useStore } from './lib/store'
 import Dashboard from './pages/Dashboard'
 import Sidebar from './components/Sidebar'
+
 import SettingsPage from './pages/SettingsPage'
 import ReposPage from './pages/ReposPage'
 import AnalysePage from './pages/AnalysePage'
@@ -9,17 +10,23 @@ import MasterPage from './pages/MasterPage'
 import PitchPage from './pages/PitchPage'
 import { Btn } from './components/UI'
 import { useLicence } from './hooks/useLicence'
+import { useEffect } from 'react'
+import SetupWizard from './components/SetupWizard'
 
 const PAGES = [Dashboard, ReposPage, AnalysePage, QAPage, MasterPage, PitchPage]
 
 export default function App() {
   const {
     currentStep, setStep, showSettings, repos, isDirty, projectName, saveProject,
-    currentProjectId, analysedCount, masterPrd
+    currentProjectId, analysedCount, masterPrd, setupComplete
   } = useStore()
   const { status } = useLicence()
 
   const Page = PAGES[currentStep] || Dashboard
+
+  if (!setupComplete) {
+    return <SetupWizard />
+  }
 
   const canGoNext = () => {
     if (currentStep === 1) return repos.some(r => r.treeData?.length > 0)
@@ -40,6 +47,7 @@ export default function App() {
   return (
     <div className="app-layout">
       <Sidebar />
+
       <main className="main-content">
         <div className="page-container">
           <div className="stage-container">
@@ -62,7 +70,7 @@ export default function App() {
           fontSize: 10, fontFamily: 'var(--font-mono)', fontWeight: 700,
           letterSpacing: '0.05em'
         }}>
-          Community Edition · 
+          Licensed {status?.tier === 'community' ? 'Community Edition' : (status?.tier?.charAt(0).toUpperCase() + status?.tier?.slice(1) || '...') + ' Edition'} · 
           <a href="http://www.linkedin.com/in/anuraagjain" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', marginLeft: 6, textDecoration: 'none' }}>
             Connect on LinkedIn
           </a>

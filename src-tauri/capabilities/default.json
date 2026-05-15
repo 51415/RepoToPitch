@@ -42,6 +42,44 @@
           "url": "http://localhost:11434/**"
         }
       ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "powershell",
+          "cmd": "powershell",
+          "args": [
+            "-Command",
+            {
+              "validator": "[\\s\\S]*"
+            }
+          ]
+
+        },
+        {
+          "name": "soffice-6",
+          "cmd": "soffice",
+          "args": [
+            { "validator": ".+" },
+            { "validator": ".+" },
+            { "validator": ".+" },
+            { "validator": ".+" },
+            { "validator": ".+" },
+            { "validator": ".+" }
+          ]
+        },
+        {
+          "name": "soffice-1",
+          "cmd": "soffice",
+          "args": [
+            { "validator": ".+" }
+          ]
+        }
+      ]
     }
   ]
 }
+
+
+
