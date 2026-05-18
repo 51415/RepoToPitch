@@ -100,3 +100,13 @@ The repository explorer implements a "Controlled Tree" pattern:
 - **Global Actions**: This enables tree-wide commands like "Expand All" and "Collapse All" to be located prominently in the section headers, separate from the scrollable tree content.
 - **Independence**: Each repository card maintains its own independent expansion state, allowing users to manage complex multi-repo projects with granular control.
 
+## 7. Native Project Lifecycle Management
+
+To ensure maximum reliability and data safety for project files (`.json`), the application implements a native-first lifecycle bridge:
+- **Native Confirmation Dialogs**: The system bypasses webview-level dialogues (`window.confirm`) in favor of the **Tauri Dialog API (`ask`)**. This triggers native OS dialogues that cannot be suppressed and provide a consistent user experience for destructive actions like "Close" or "New Project".
+- **State-Driven Step Navigation**: The project lifecycle is tied directly to the UI step machine. Opening or resetting a project automatically transitions the user to the **Repository Explorer (Step 1)**, ensuring a zero-friction workflow.
+- **Project Metadata Tracking**: To prevent performance degradation, the application separates project content from project history. The global store tracks only lightweight metadata (IDs, Names, and File Paths) for the "Open Recent" list, loading full technical context only upon explicit project activation.
+- **Unsaved Work Guard**: A reactive `isDirty` flag is synchronized across all strategic and technical input modules. The Sidebar dynamically updates to show a "Dirty" state (e.g., `SAVE*`, `CLOSE*`), providing immediate visual confirmation that changes are pending.
+- **Auto-Saving Path Preservation**: Opening an existing project file via `handleOpenFile` or `loadProject` registers the absolute path inside `projectFilePath` state, enabling subsequent **SAVE** click actions to write silently and instantly directly back to that file on disk without prompting save dialogs.
+
+

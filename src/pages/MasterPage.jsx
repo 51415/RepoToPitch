@@ -298,8 +298,6 @@ export default function MasterPage() {
       for (const type of sequence) {
         await runGenericArtifact(type)
       }
-      
-      await runPitchDeck()
     } catch (e) {
       console.error("All-Synthesis Error:", e)
     }

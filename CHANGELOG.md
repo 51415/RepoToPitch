@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4] — 2026-05-18
+### Native Synthesis & UX Hardening
+- **Tauri Security Sandboxing**: Resolved runtime scope exceptions on absolute system paths under Tauri 2.0. The filesystem check now validates files relatively within the namespaced AppData sandbox before resolving them dynamically for native engines.
+- **Zero-Friction Silent Saving**: Captures and registers the project's absolute disk path upon loading or opening a `.json` file from the dashboard, enabling the **SAVE** button to persist state changes silently and instantly back to disk without recurrent dialog prompts.
+- **PowerPoint COM Synthesis Optimization**: Streamlined PowerPoint native COM synthesis to support headless execution and graceful fallback handling.
+- **Versioning Parity**: Synchronized package config files and in-app system core panels to version 1.1.4 across the ecosystem.
+
+## [1.1.3] — 2026-05-18
+### Export Engine Enhancements
+- **PowerPoint COM Template Application**: Completely refactored `exportAsPptx` and `exportPitchAsPDF` pipelines to prioritize Native MS Office COM, applying custom templates natively via `$pres.ApplyTemplate(...)` with zero XML manipulation, preventing layout/schema corruption.
+- **PowerPoint COM Double Bullets**: Integrated regex-based duplicate bullet trimming (`$b -replace '^[•\-\*\s]+', ''`) directly in the PowerShell loop, eliminating double-bullet rendering bugs natively.
+- **Word (DOCX) High-Fidelity Inline Markdown Parser**: Introduced a linear, character-by-character Markdown parser (`parseInlineMarkdown`) that converts standard bold (`**`), italic (`*`), and inline code (`` ` ``) formatting into native Word `TextRun` elements.
+- **Word (DOCX) Bullet-Prefix Logic**: Swapped the greedy list-prefix trimmer with a precise `^[-*•]\s+` match to protect nested markdown bold styling (e.g. `* **Bold**`) from losing its bold markers during generation.
+
 ## [1.1.2] — 2026-05-15
 ### Native Synthesis Stabilization
 - **Unified Native Engine**: Standardized Pitch and Synthesis PDF exports to use the exact same Native COM synthesis engine as PPTX, ensuring 100% formatting parity.

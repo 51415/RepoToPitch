@@ -53,7 +53,7 @@ export default function Dashboard() {
         const content = await readTextFile(selected)
         const project = JSON.parse(content)
         if (project.id && project.name) {
-          importProjectData(project)
+          importProjectData(project, selected)
           setStep(1) // Move to Repos
         } else {
           const { message } = await import('@tauri-apps/plugin-dialog')

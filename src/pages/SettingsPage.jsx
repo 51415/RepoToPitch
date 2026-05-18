@@ -9,7 +9,7 @@ import { readFile, writeTextFile, mkdir, exists, writeFile, BaseDirectory } from
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { getInstalledPlugins } from '../lib/pluginLoader'
 import { invoke } from '@tauri-apps/api/core'
-import { configDir, join } from '@tauri-apps/api/path'
+import { appDataDir, join } from '@tauri-apps/api/path'
 
 // Core Tabs
 import { ModelsTab } from '../components/Settings/ModelsTab'
@@ -96,7 +96,7 @@ export default function SettingsPage() {
       if (selected) {
         const buffer = await readFile(selected)
         const content = new TextDecoder().decode(buffer)
-        const baseConfig = await configDir()
+        const baseConfig = await appDataDir()
         const pluginDir = await join(baseConfig, 'growthvariable', 'RepoToPitch', 'plugins', pluginId)
         await writeTextFile(await join(pluginDir, entryName || 'branding.js'), content)
         const updatedList = await getInstalledPlugins()
@@ -130,7 +130,7 @@ export default function SettingsPage() {
 
   const handleSelectTemplate = async (type, fileObj) => {
     try {
-      const baseConfig = await configDir()
+      const baseConfig = await appDataDir()
       const brandConfigDir = await join(baseConfig, 'growthvariable', 'RepoToPitch', 'brand')
       await mkdir('growthvariable/RepoToPitch/brand', { baseDir: BaseDirectory.AppData, recursive: true })
 
@@ -138,9 +138,11 @@ export default function SettingsPage() {
         const reader = new FileReader()
         reader.onload = async (e) => {
           const arrayBuffer = e.target.result
-          await writeFile(`growthvariable/RepoToPitch/brand/${fileObj.name || `template.${type}`}`, new Uint8Array(arrayBuffer), { baseDir: BaseDirectory.AppData })
+          const name = fileObj.name || `template.${type}`
+          await writeFile(`growthvariable/RepoToPitch/brand/${name}`, new Uint8Array(arrayBuffer), { baseDir: BaseDirectory.AppData })
           await extractTemplateXML(type, arrayBuffer)
-          setLocalBrandConfig(prev => ({ ...prev, templates: { ...(prev?.templates || {}), [type]: join(brandConfigDir, fileObj.name || `template.${type}`) } }))
+          const fullPath = await join(brandConfigDir, name)
+          setLocalBrandConfig(prev => ({ ...prev, templates: { ...(prev?.templates || {}), [type]: fullPath } }))
         }
         reader.readAsArrayBuffer(fileObj); return;
       }
@@ -151,7 +153,8 @@ export default function SettingsPage() {
         const buffer = await readFile(selected)
         await writeFile(`growthvariable/RepoToPitch/brand/${fileName}`, buffer, { baseDir: BaseDirectory.AppData })
         await extractTemplateXML(type, buffer.buffer || buffer)
-        setLocalBrandConfig(prev => ({ ...prev, templates: { ...(prev?.templates || {}), [type]: join(brandConfigDir, fileName) } }))
+        const fullPath = await join(brandConfigDir, fileName)
+        setLocalBrandConfig(prev => ({ ...prev, templates: { ...(prev?.templates || {}), [type]: fullPath } }))
       }
     } catch (err) { alert(`Copy failed: ${err.message || err}`) }
   }

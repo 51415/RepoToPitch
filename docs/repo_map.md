@@ -41,6 +41,8 @@ This document provides a high-level overview of the codebase structure for devel
 6.  **High-Fidelity Sanitization Layer**: Implements a multi-pass 'Nuclear Purge' that strips Markdown/LaTeX noise and stabilizes PDF typography for investor-ready results.
 7.  **Iterative Synthesis Engine**: Complex generations are broken into atomic sub-tasks to ensure stability on local models and hardware.
 8.  **Controlled Tree Pattern**: Repository explorers use a lifted-state pattern to provide global Expand/Collapse control and independent directory management.
+9.  **Native Project Lifecycle Management**: All major project state changes (New, Open, Close) are handled via a native **Tauri Dialog bridge (`ask`)**. This ensures OS-level confirmation dialogues and triggers automatic navigation to the **Repository Explorer (Step 1)** to maintain workflow momentum. Opening an existing project file via `handleOpenFile` or `loadProject` registers the absolute path inside the `projectFilePath` state, enabling subsequent **SAVE** click actions to write silently and instantly directly back to that file on disk.
+
 
 
 ## Platform Support

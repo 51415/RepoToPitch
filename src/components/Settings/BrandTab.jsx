@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Btn } from '../UI'
 import { checkExportDependencies, downloadLibreOffice } from '../../lib/dependencyCheck'
 
-export function BrandTab({
+export default function BrandTab({
   localBrandConfig,
   setLocalBrandConfig,
   handleSelectTemplate
@@ -49,24 +49,8 @@ export function BrandTab({
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Word Template Box */}
-            <input 
-              type="file" 
-              accept=".docx" 
-              id="docx-file-input" 
-              style={{ display: 'none' }} 
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleSelectTemplate('docx', e.target.files[0])
-                  e.target.value = null
-                }
-              }} 
-            />
             <div 
-              onClick={() => {
-                const input = document.getElementById('docx-file-input')
-                if (input) input.click()
-                else handleSelectTemplate('docx')
-              }}
+              onClick={() => handleSelectTemplate('docx')}
               style={{ 
                 border: '2px dashed var(--border)', padding: 24, 
                 textAlign: 'center', background: 'var(--bg-2)', borderRadius: 8, cursor: 'pointer',
@@ -98,24 +82,8 @@ export function BrandTab({
             </div>
 
             {/* PowerPoint Template Box */}
-            <input 
-              type="file" 
-              accept=".pptx" 
-              id="pptx-file-input" 
-              style={{ display: 'none' }} 
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleSelectTemplate('pptx', e.target.files[0])
-                  e.target.value = null
-                }
-              }} 
-            />
             <div 
-              onClick={() => {
-                const input = document.getElementById('pptx-file-input')
-                if (input) input.click()
-                else handleSelectTemplate('pptx')
-              }}
+              onClick={() => handleSelectTemplate('pptx')}
               style={{ 
                 border: '2px dashed var(--border)', padding: 24, 
                 textAlign: 'center', background: 'var(--bg-2)', borderRadius: 8, cursor: 'pointer',

@@ -227,13 +227,25 @@ export const useStore = create(
         }
       },
 
-      loadProject: (id) => {
+      loadProject: async (id) => {
         const project = get().projects.find(p => p.id === id)
         if (!project) return
-        get().importProjectData(project)
+        if (project.path) {
+          try {
+            const { readTextFile } = await import('@tauri-apps/plugin-fs')
+            const content = await readTextFile(project.path)
+            const projectData = JSON.parse(content)
+            get().importProjectData(projectData, project.path)
+          } catch (e) {
+            console.error('[LOAD] Failed to load project from disk:', project.path, e)
+            get().importProjectData(project, project.path)
+          }
+        } else {
+          get().importProjectData(project)
+        }
       },
 
-      importProjectData: (project) => {
+      importProjectData: (project, filePath = null) => {
         set({
           repos: project.data.repos,
           qaAnswers: project.data.qaAnswers,
@@ -253,7 +265,7 @@ export const useStore = create(
           customPrompts: project.data.customPrompts,
           projectName: project.name,
           currentProjectId: project.id,
-          projectFilePath: project.path || null,
+          projectFilePath: filePath || project.path || null,
           currentStep: 0,
           isDirty: false,
           activeRepoId: null,

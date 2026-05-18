@@ -46,6 +46,85 @@ function sanitize(text) {
   return s.replace(/\s+/g, ' ').trim()
 }
 
+function parseInlineMarkdown(text) {
+  if (!text) return [];
+  const runs = [];
+  let i = 0;
+  let currentText = '';
+
+  const flushText = () => {
+    if (currentText) {
+      runs.push(new TextRun({ text: sanitize(currentText) }));
+      currentText = '';
+    }
+  };
+
+  while (i < text.length) {
+    if (text.startsWith('**', i)) {
+      const closing = text.indexOf('**', i + 2);
+      if (closing !== -1) {
+        flushText();
+        const content = text.slice(i + 2, closing);
+        runs.push(new TextRun({ text: sanitize(content), bold: true }));
+        i = closing + 2;
+        continue;
+      }
+    }
+    if (text.startsWith('*', i)) {
+      const closing = text.indexOf('*', i + 1);
+      if (closing !== -1) {
+        flushText();
+        const content = text.slice(i + 1, closing);
+        runs.push(new TextRun({ text: sanitize(content), italic: true }));
+        i = closing + 1;
+        continue;
+      }
+    }
+    if (text.startsWith('`', i)) {
+      const closing = text.indexOf('`', i + 1);
+      if (closing !== -1) {
+        flushText();
+        const content = text.slice(i + 1, closing);
+        runs.push(new TextRun({ text: sanitize(content), font: "Consolas", color: "2563EB" }));
+        i = closing + 1;
+        continue;
+      }
+    }
+    currentText += text[i];
+    i++;
+  }
+  flushText();
+  return runs;
+}
+
+async function resolvePptxTemplatePath() {
+  const brandConfig = useStore.getState().brandConfig;
+  try {
+    const { exists, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+    const { appDataDir, join } = await import('@tauri-apps/api/path');
+    
+    // 1. Custom Template
+    if (brandConfig?.templates?.pptx) {
+      const fileName = brandConfig.templates.pptx.split(/[\\/]/).pop();
+      if (fileName) {
+        const relativePath = `growthvariable/RepoToPitch/brand/${fileName}`;
+        if (await exists(relativePath, { baseDir: BaseDirectory.AppData })) {
+          return await join(await appDataDir(), relativePath);
+        }
+      }
+    }
+
+    // 2. Default AppData Template
+    const defaultRelative = 'growthvariable/RepoToPitch/brand/template.pptx';
+    if (await exists(defaultRelative, { baseDir: BaseDirectory.AppData })) {
+      return await join(await appDataDir(), defaultRelative);
+    }
+  } catch (e) {
+    console.warn('[EXPORT] Failed to resolve PPTX template path:', e);
+  }
+  return null;
+}
+
 async function saveNative(filename, data, isBinary = false) {
   try {
     const { save } = await import('@tauri-apps/plugin-dialog')
@@ -161,8 +240,9 @@ async function generateDocxBlob(title, content) {
       children.push(new Paragraph({ text: sanitize(line.replace('### ', '')), heading: HeadingLevel.HEADING_3, spacing: { before: 200, after: 120 } }));
       i++;
     } else if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+      const trimmedLine = line.trim().replace(/^[-*•]\s+/, '');
       children.push(new Paragraph({
-        text: sanitize(line.trim().replace(/^[*\-•\s]+/, '')),
+        children: parseInlineMarkdown(trimmedLine),
         bullet: { level: 0 },
         spacing: { after: 120 }
       }));
@@ -226,7 +306,7 @@ async function generateDocxBlob(title, content) {
       }
     } else if (line.trim()) {
       children.push(new Paragraph({
-        children: [new TextRun(sanitize(line.trim()))],
+        children: parseInlineMarkdown(line.trim()),
         spacing: { after: 120 },
       }));
       i++;
@@ -615,7 +695,7 @@ async function generatePptxBlob(slides, overrideBrandConfig) {
       } else if (isBodyShape && !filledPh.has('body')) {
         filledPh.add('body');
         const bodyFontSize = (slideData.bullets || []).length > 10 ? '800' : ((slideData.bullets || []).length > 6 ? '1000' : '1200');
-        const bodyItems = (slideData.bullets || []).map(b => `<a:p><a:pPr><a:lnSpc><a:spcPct val="120000"/></a:lnSpc><a:defRPr sz="${bodyFontSize}"/></a:pPr><a:r><a:t>• ${xmlEscape(sanitize(b))}</a:t></a:r></a:p>`);
+        const bodyItems = (slideData.bullets || []).map(b => `<a:p><a:pPr><a:lnSpc><a:spcPct val="120000"/></a:lnSpc><a:defRPr sz="${bodyFontSize}"/></a:pPr><a:r><a:t>${xmlEscape(sanitize(b.replace(/^[•\-\*\s]+/, '')))}</a:t></a:r></a:p>`);
 
         // If the template LACKS a subtitle placeholder, we prepend the subtitle to the body items
         if (!xml.includes('type="subTitle"') && slideData.subtitle) {
@@ -686,9 +766,12 @@ async function generatePptxBlob(slides, overrideBrandConfig) {
 /**
  * EXPORT PITCH DECK AS PPTX (TEMPLATE INJECTION)
  */
+/**
+ * EXPORT PITCH DECK AS PPTX
+ */
 export const exportAsPptx = (slides, filename, overrideBrandConfig) => withCursor(async (deps) => {
   try {
-    // 1. Try Native MS Office Route (Standard Pitch Deck)
+    // 1. Try Native MS Office Route (Highest Fidelity, Prioritized)
     if (deps.msOffice) {
       const { appLocalDataDir, join } = await import('@tauri-apps/api/path');
       const { readFile, writeFile } = await import('@tauri-apps/plugin-fs');
@@ -697,7 +780,8 @@ export const exportAsPptx = (slides, filename, overrideBrandConfig) => withCurso
       const dataDir = await appLocalDataDir();
       const tempPath = await join(dataDir, `temp_gen.pptx`);
       
-      await generateNativePptx(slides, tempPath, false);
+      const templatePath = await resolvePptxTemplatePath();
+      await generateNativePptx(slides, tempPath, false, templatePath);
       
       const bytes = await readFile(tempPath);
       const target = await save({ defaultPath: filename, filters: [{ name: 'PowerPoint', extensions: ['pptx'] }] });
@@ -708,13 +792,13 @@ export const exportAsPptx = (slides, filename, overrideBrandConfig) => withCurso
     // 2. Fallback to XML Injection (LibreOffice / Branded Plugins)
     const blob = await generatePptxBlob(slides, overrideBrandConfig);
     if (!blob) {
-       const { message, ask } = await import('@tauri-apps/plugin-dialog');
-       const download = await ask('No PPTX template found. Native Office was also not detected.\n\nWould you like to download the default template pack?', { title: 'Template Required', type: 'warning' });
-       if (download) {
-          const { open } = await import('@tauri-apps/plugin-shell');
-          await open('https://repotopitch.com/templates');
-       }
-       return;
+      const { message, ask } = await import('@tauri-apps/plugin-dialog');
+      const download = await ask('No PPTX template found. Native Office was also not detected.\n\nWould you like to download the default template pack?', { title: 'Template Required', type: 'warning' });
+      if (download) {
+        const { open } = await import('@tauri-apps/plugin-shell');
+        await open('https://repotopitch.com/templates');
+      }
+      return;
     }
     const arrayBuffer = await blob.arrayBuffer();
     await saveNative(filename, new Uint8Array(arrayBuffer), true);
@@ -731,7 +815,7 @@ export const exportAsPptx = (slides, filename, overrideBrandConfig) => withCurso
  */
 export const exportPitchAsPDF = (slides, filename) => withCursor(async (deps) => {
   try {
-    // 1. Try Native MS Office Route (Highest Fidelity)
+    // 1. Try Native MS Office Route (Highest Fidelity, Prioritized)
     if (deps.msOffice) {
       const { appLocalDataDir, join } = await import('@tauri-apps/api/path');
       const { readFile, writeFile } = await import('@tauri-apps/plugin-fs');
@@ -740,7 +824,8 @@ export const exportPitchAsPDF = (slides, filename) => withCursor(async (deps) =>
       const dataDir = await appLocalDataDir();
       const tempPath = await join(dataDir, `temp_gen.pdf`);
       
-      await generateNativePptx(slides, tempPath, true);
+      const templatePath = await resolvePptxTemplatePath();
+      await generateNativePptx(slides, tempPath, true, templatePath);
       
       const bytes = await readFile(tempPath);
       const target = await save({ defaultPath: filename, filters: [{ name: 'PDF', extensions: ['pdf'] }] });
@@ -751,9 +836,9 @@ export const exportPitchAsPDF = (slides, filename) => withCursor(async (deps) =>
     // 2. Fallback to XML Injection -> LibreOffice Conversion
     const pptxBlob = await generatePptxBlob(slides);
     if (!pptxBlob) {
-       const { message, ask } = await import('@tauri-apps/plugin-dialog');
-       await message('No PPTX template found for PDF conversion. Please ensure a template is configured or install MS Office for native export.', { title: 'Template Required', type: 'warning' });
-       return;
+      const { message } = await import('@tauri-apps/plugin-dialog');
+      await message('No PPTX template found for PDF conversion. Please ensure a template is configured or install MS Office for native export.', { title: 'Template Required', type: 'warning' });
+      return;
     }
     const { success, error } = await convertOfficeToPdf(pptxBlob, 'pptx', filename);
     if (!success) throw new Error(error);
@@ -769,7 +854,7 @@ export const exportPitchAsPDF = (slides, filename) => withCursor(async (deps) =>
 
 
 
-async function generateNativePptx(slides, targetPath, isPdf = false) {
+async function generateNativePptx(slides, targetPath, isPdf = false, templatePath = null) {
   const { Command } = await import('@tauri-apps/plugin-shell');
 
   // Prepare slide data for PowerShell (Base64 to avoid escaping issues)
@@ -781,48 +866,239 @@ async function generateNativePptx(slides, targetPath, isPdf = false) {
     # PowerPoint: ppAlertsNone = 1
     try { $app.DisplayAlerts = 1 } catch {}
     
-    try {
-      # msoFalse = 0 (Silent), msoTrue = -1 (Visible)
+    $tpl = "${templatePath || ''}"
+    $useTemplate = $false
+    $workingPath = "${targetPath}"
+    if ($tpl -and (Test-Path $tpl)) {
+      $useTemplate = $true
+      if ("${isPdf}" -eq "True") {
+        $workingPath = "${targetPath}.pptx"
+      }
+      Copy-Item -Path $tpl -Destination $workingPath -Force
+    }
+
+    # Helper to resolve layouts natively from slide master
+    function Get-SafeLayout($pres, $layoutType) {
       try {
-        $pres = $app.Presentations.Add(0) 
-      } catch {
-        $pres = $app.Presentations.Add(-1)
+        $master = $pres.SlideMaster
+        if ($null -eq $master -and $pres.Designs.Count -gt 0) {
+          $master = $pres.Designs.Item(1).SlideMaster
+        }
+        if ($null -ne $master -and $master.CustomLayouts.Count -gt 0) {
+          if ($layoutType -eq 1) {
+            foreach ($layout in $master.CustomLayouts) {
+              if ($layout.Name -like "*Title Slide*" -or $layout.Name -like "*TitleSlide*") {
+                return $layout
+              }
+            }
+            return $master.CustomLayouts.Item(1)
+          } else {
+            foreach ($layout in $master.CustomLayouts) {
+              if ($layout.Name -like "*Content*" -or $layout.Name -like "*Text*") {
+                return $layout
+              }
+            }
+            if ($master.CustomLayouts.Count -ge 2) {
+              return $master.CustomLayouts.Item(2)
+            }
+            return $master.CustomLayouts.Item(1)
+          }
+        }
+      } catch {}
+      return $null
+    }
+
+    try {
+      $originalSlidesCount = 0
+      if ($useTemplate) {
+        # Open the copied template presentation (WithWindow = 0 to run silently)
+        try {
+          $pres = $app.Presentations.Open($workingPath, 0, 0, 0)
+        } catch {
+          $pres = $app.Presentations.Open($workingPath, 0, 0, -1)
+        }
+        $originalSlidesCount = $pres.Slides.Count
+      } else {
+        # Fallback: Create a blank presentation
+        try {
+          $pres = $app.Presentations.Add(0) 
+        } catch {
+          $pres = $app.Presentations.Add(-1)
+        }
       }
       
       $jsonRaw = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${slideDataB64}"))
       $slidesData = $jsonRaw | ConvertFrom-Json
       
+      $idx = 0
       foreach ($s in $slidesData) {
-        # ppLayoutText = 2
-        $slide = $pres.Slides.Add($pres.Slides.Count + 1, 2)
+        $slideNum = $idx + 1
+        $isTitle = $idx -eq 0
         
-        if ($s.title) {
-          $titleFontSize = if ($s.title.Length -gt 40) { 32 } else { 44 }
-          $slide.Shapes.Title.TextFrame.TextRange.Text = $s.title
-          $slide.Shapes.Title.TextFrame.TextRange.Font.Size = $titleFontSize
+        $layoutType = 2
+        if ($isTitle) { $layoutType = 1 }
+        
+        $slide = $null
+        
+        # 1. Duplication Pathway (Preserves layout/shapes of custom slide designs)
+        if ($useTemplate -and $originalSlidesCount -gt 0) {
+          $templateIndex = 1
+          if (!$isTitle -and $originalSlidesCount -ge 2) {
+            $templateIndex = 2
+          }
+          try {
+            $templateSlide = $pres.Slides.Item($templateIndex)
+            $dupRange = $templateSlide.Duplicate()
+            $slide = $dupRange.Item(1)
+            $slide.MoveTo($pres.Slides.Count)
+          } catch {
+            # Fallback on failure
+          }
         }
         
+        # 2. Layout Pathway (Standard/Fallback creation using Slide Master custom layouts)
+        if ($null -eq $slide) {
+          $layout = $null
+          if ($useTemplate) {
+            $layout = Get-SafeLayout -pres $pres -layoutType $layoutType
+          }
+          
+          if ($null -ne $layout) {
+            try {
+              $slide = $pres.Slides.AddSlide($pres.Slides.Count + 1, $layout)
+            } catch {
+              $slide = $pres.Slides.Add($pres.Slides.Count + 1, $layoutType)
+            }
+          } else {
+            $slide = $pres.Slides.Add($pres.Slides.Count + 1, $layoutType)
+          }
+        }
+        
+        # Populate slide title
+        $titleShape = $null
+        if ($s.title) {
+          $titleFontSize = if ($s.title.Length -gt 40) { 32 } else { 44 }
+          
+          # Try resolving by placeholder type (ppPlaceholderTitle=1, ppPlaceholderCenterTitle=3)
+          foreach ($sh in $slide.Shapes) {
+            if ($sh.Type -eq 14) {
+              $phType = $sh.PlaceholderFormat.Type
+              if ($phType -eq 1 -or $phType -eq 3) {
+                $titleShape = $sh
+                break
+              }
+            }
+          }
+          # Fallback by name
+          if ($null -eq $titleShape) {
+            foreach ($sh in $slide.Shapes) {
+              if ($sh.HasTextFrame -and ($sh.Name -like "*Title*")) {
+                $titleShape = $sh
+                break
+              }
+            }
+          }
+          # Fallback to slide's built-in Title shape range
+          if ($null -eq $titleShape -and $slide.Shapes.HasTitle -eq -1) {
+            $titleShape = $slide.Shapes.Title
+          }
+          # Fallback to first shape containing a text frame
+          if ($null -eq $titleShape) {
+            foreach ($sh in $slide.Shapes) {
+              if ($sh.HasTextFrame) {
+                $titleShape = $sh
+                break
+              }
+            }
+          }
+          
+          if ($null -ne $titleShape) {
+            $titleShape.TextFrame.TextRange.Text = $s.title
+            $titleShape.TextFrame.TextRange.Font.Size = $titleFontSize
+          } elseif ($slide.Shapes.Count -gt 0) {
+            try {
+              $slide.Shapes.Item(1).TextFrame.TextRange.Text = $s.title
+            } catch {}
+          }
+        }
+        
+        # Populate bullets / body
         $bulletCount = if ($s.bullets) { $s.bullets.Count } else { 0 }
         $fontSize = if ($bulletCount -gt 10) { 10 } elseif ($bulletCount -gt 6) { 12 } else { 14 }
         
         $body = ""
         if ($s.subtitle) { $body += $s.subtitle + "\`n" }
         if ($s.bullets) {
-          foreach ($b in $s.bullets) { $body += "• " + $b + "\`n" }
+          foreach ($b in $s.bullets) {
+            $cleaned = $b -replace '^[•\\-\\*\\s]+', ''
+            $body += "• " + $cleaned + "\`n"
+          }
         }
         
-        $contentShape = $slide.Shapes.Item(2)
-        $contentShape.TextFrame.TextRange.ParagraphFormat.Bullet.Visible = 0
-        $contentShape.TextFrame.TextRange.Font.Size = $fontSize
-        $contentShape.TextFrame.TextRange.ParagraphFormat.LineRuleWithin = $true
-        $contentShape.TextFrame.TextRange.ParagraphFormat.SpaceWithin = 1.2
-        $contentShape.TextFrame.TextRange.Text = $body
+        if ($body) {
+          $bodyShape = $null
+          # Try placeholder types (ppPlaceholderBody=2, ppPlaceholderObject=7, ppPlaceholderSubtitle=4)
+          foreach ($sh in $slide.Shapes) {
+            if ($sh.Type -eq 14) {
+              $phType = $sh.PlaceholderFormat.Type
+              if ($phType -eq 2 -or $phType -eq 7 -or $phType -eq 4) {
+                if ($null -eq $titleShape -or $sh.Name -ne $titleShape.Name) {
+                  $bodyShape = $sh
+                  break
+                }
+              }
+            }
+          }
+          # Fallback by name
+          if ($null -eq $bodyShape) {
+            foreach ($sh in $slide.Shapes) {
+              if ($sh.HasTextFrame -and ($sh.Name -like "*Content*" -or $sh.Name -like "*Body*" -or $sh.Name -like "*Object*")) {
+                if ($null -eq $titleShape -or $sh.Name -ne $titleShape.Name) {
+                  $bodyShape = $sh
+                  break
+                }
+              }
+            }
+          }
+          # Fallback to second shape with text frame
+          if ($null -eq $bodyShape) {
+            $textShapes = @()
+            foreach ($sh in $slide.Shapes) {
+              if ($sh.HasTextFrame -and ($null -eq $titleShape -or $sh.Name -ne $titleShape.Name)) {
+                $textShapes += $sh
+              }
+            }
+            if ($textShapes.Count -gt 0) {
+              $bodyShape = $textShapes[0]
+            }
+          }
+          
+          if ($null -ne $bodyShape) {
+            $bodyShape.TextFrame.TextRange.ParagraphFormat.Bullet.Visible = 0
+            $bodyShape.TextFrame.TextRange.Font.Size = $fontSize
+            $bodyShape.TextFrame.TextRange.ParagraphFormat.LineRuleWithin = $true
+            $bodyShape.TextFrame.TextRange.ParagraphFormat.SpaceWithin = 1.2
+            $bodyShape.TextFrame.TextRange.Text = $body
+          }
+        }
         
+        # Populate speaker notes
         $notesText = $s.notes -join "\`n"
         if (!$notesText) { $notesText = $s.speakerNotes }
         if (!$notesText) { $notesText = $s.speaker_note }
         if ($notesText) {
-           $slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text = $notesText
+          try {
+            $slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text = $notesText
+          } catch {}
+        }
+        
+        $idx++
+      }
+      
+      # Clean up original template slides
+      if ($useTemplate -and $originalSlidesCount -gt 0) {
+        for ($i = 1; $i -le $originalSlidesCount; $i++) {
+          try { $pres.Slides.Item(1).Delete() } catch {}
         }
       }
 
@@ -837,9 +1113,14 @@ async function generateNativePptx(slides, targetPath, isPdf = false) {
            $pres.SaveAs("${targetPath}", 32)
         }
       } else {
-        $pres.SaveAs("${targetPath}")
+        $pres.SaveAs($workingPath)
       }
       $pres.Close()
+      
+      # Clean up the working file if it was a temporary PPTX file
+      if ($useTemplate -and "${isPdf}" -eq "True") {
+        try { Remove-Item -Path $workingPath -Force } catch {}
+      }
     } catch {
       throw $_
     } finally {

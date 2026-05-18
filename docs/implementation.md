@@ -43,7 +43,7 @@ Task monitoring is handled via the `addTask` and `updateTask` methods in `src/li
 
 ## 5. Unified Native Synthesis Engine
 Exports are handled by `src/lib/exportUtils.js` using a hybrid approach that prioritizes native fidelity:
-- **Hardened COM Bridge**: If Microsoft Office is detected, the system uses a PowerShell-backed COM bridge to generate DOCX, PPTX, and PDF files. This ensures 100% formatting parity and professional-grade layout.
+- **Hardened COM Bridge & Robust Copy-and-Duplicate Template Strategy**: If Microsoft Office is detected, the system uses a PowerShell-backed COM bridge to generate DOCX, PPTX, and PDF files. It utilizes a highly robust copy-and-duplicate template strategy where the template presentation is copied to the destination path, opened natively in PowerPoint COM (silently via `WithWindow=0` or gracefully falling back to visible), and its Slide 1 (title slide) and Slide 2 (content slide) are updated. Slides beyond slide 2 are dynamically created by duplicating Slide 2 of the template and moving it to the end, ensuring that custom backgrounds, fonts, shapes, and master layouts from the template are 100% natively retained.
 - **Template-Less Native Export**: Enables the generation of branded artifacts from scratch by directly manipulating the Office Object Model, bypassing the need for external template files.
 - **Fallback Pipeline**: For systems without Office, the app falls back to browser-native libraries:
     - **docx**: For structural Word document generation.
@@ -80,4 +80,31 @@ The migration of the repository tree to a controlled component allows for:
 - **External Triggers**: The "Expand All" and "Collapse All" buttons are implemented as secondary-variant `Btn` components in `ReposPage.jsx`.
 - **Recursive State Calculation**: The `collapseAll` function performs a full depth-first walk of the `treeData` object to pre-calculate all directory paths, ensuring the entire tree is collapsed with a single state update.
 - **Performance**: Managing the expansion set via a `Set` object provides O(1) lookups during tree rendering, maintaining 60fps even for deep nested structures.
+
+## 10. Architectural Constraints & Preservations: The "Golden Rules"
+
+To maintain core system stability, prevent regression in community releases, and protect project files, developers **must** strictly adhere to the following architecture rules when modifying the codebase.
+
+### 10.1 Tauri Security Sandboxing & Path Resolution
+
+*   **What Must Always Be Preserved:**
+    1.  **Relative Path Verification:** Under Tauri 2.0, checking absolute paths (e.g. `exists(C:/...)`) triggers a security scope exception. You **must** verify files relatively inside the AppData sandbox first:
+        ```javascript
+        await exists(relativePath, { baseDir: BaseDirectory.AppData })
+        ```
+        Once verified, resolve the absolute path dynamically using `join(await appDataDir(), relativePath)` to feed to external native operations.
+    2.  **Bundle Namespacing Alignment:** Use `@tauri-apps/api/path`'s `appDataDir()` instead of `configDir()` to align all path calculations with Tauri 2.0's bundle app data directories.
+*   **What Must Never Be Done:**
+    1.  **Never call `exists()` on an absolute path directly:** This violates Tauri's security scope policy and will crash path resolution.
+
+### 10.2 Project Saving & Loading Flow
+
+*   **What Must Always Be Preserved:**
+    1.  **File Path Injection:** When opening an existing project file via `handleOpenFile` or loading via `loadProject`, the file path **must** be passed directly into `importProjectData(projectData, filePath)` so the Zustand state maintains `projectFilePath`.
+    2.  **Silent Project Auto-Saving:** When clicking the **SAVE** button on an active, loaded project, if `projectFilePath` is already set, the application must save to that path silently without prompting a save file dialog box.
+    3.  **New Project Prompting:** A brand-new project has `projectFilePath` set to `null` initially. When clicking **SAVE**, the sidebar must check if `projectName` exists. If not, prompt the user for a name, and then display the native save file picker to lock down the file location.
+*   **What Must Never Be Done:**
+    1.  **Never Serialize the Local File Path inside the JSON Content:** Machine-local paths are specific to individual computers. Serializing them inside the JSON file would destroy project portability.
+
+
 
