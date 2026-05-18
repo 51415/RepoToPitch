@@ -24,7 +24,7 @@ export function AboutTab({
             </div>
           </div>
           <p style={{ color: 'var(--text-3)', fontFamily: 'var(--font-mono)', fontSize: 11, margin: 0 }}>
-            REPOTOPITCH V1.1.4 · COMMUNITY PLATFORM ENGINE LAYER
+            REPOTOPITCH V1.1.5 · COMMUNITY PLATFORM ENGINE LAYER
           </p>
         </div>
 

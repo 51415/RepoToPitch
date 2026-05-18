@@ -2,12 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.4] — 2026-05-18
+## [1.1.5] — 2026-05-18
 ### Native Synthesis & UX Hardening
 - **Tauri Security Sandboxing**: Resolved runtime scope exceptions on absolute system paths under Tauri 2.0. The filesystem check now validates files relatively within the namespaced AppData sandbox before resolving them dynamically for native engines.
 - **Zero-Friction Silent Saving**: Captures and registers the project's absolute disk path upon loading or opening a `.json` file from the dashboard, enabling the **SAVE** button to persist state changes silently and instantly back to disk without recurrent dialog prompts.
 - **PowerPoint COM Synthesis Optimization**: Streamlined PowerPoint native COM synthesis to support headless execution and graceful fallback handling.
-- **Versioning Parity**: Synchronized package config files and in-app system core panels to version 1.1.4 across the ecosystem.
+- **Versioning Parity**: Synchronized package config files and in-app system core panels to version 1.1.5 across the ecosystem.
 
 ## [1.1.3] — 2026-05-18
 ### Export Engine Enhancements
